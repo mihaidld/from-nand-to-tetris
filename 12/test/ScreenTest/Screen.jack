@@ -1,0 +1,234 @@
+/** This class provides functions for  displaying graphical shapes 
+on the screen.
+The Hack physical screen consists of 
+256 rows (indexed 0…255, top to bottom) of 
+512 pixels each (indexed 0…511, left to right). 
+The top-left pixel on the screen is indexed (0,0).*/
+class Screen {
+    static boolean color;
+    static int SCREEN, KBD;
+    // static Array twoToThe;
+
+    /** Initializes the Screen. */
+    function void init() {
+        let color = true;
+        let SCREEN = 16384;
+        let KBD = 24576;
+        // let twoToThe = Array.new(16);
+        // let twoToThe[0] = 1;
+        // let twoToThe[1] = 2;
+        // let twoToThe[2] = 4;
+        // let twoToThe[3] = 8;
+        // let twoToThe[4] = 16;
+        // let twoToThe[5] = 32;
+        // let twoToThe[6] = 64;
+        // let twoToThe[7] = 128;
+        // let twoToThe[8] = 256;
+        // let twoToThe[9] = 512;
+        // let twoToThe[10] = 1024;
+        // let twoToThe[11] = 2048;
+        // let twoToThe[12] = 4096;
+        // let twoToThe[13] = 8192;
+        // let twoToThe[14] = 16384;//0100000000000000
+        // let twoToThe[15] = -32767-1;//1000000000000000
+        return;
+    }
+
+    /** Erases the entire screen. */
+    function void clearScreen(){
+        var int address;
+        let address = SCREEN;
+        while(address < KBD){
+            do Memory.poke(address, 0);//set to 0 every word in screen
+            let address = address + 1;
+        }
+        return;
+    }
+
+    /** Sets the current color. 
+    This color will be used in all the subsequent drawXxx function calls. 
+    Black is represented by true, white by false.*/
+    function void setColor(boolean b){
+        let color = b;
+        return;
+    }
+
+    /** Draws the (x,y) pixel using the current color.*/
+    function void drawPixel(int x, int y){
+        var int address, value, q, i;
+        let q = x / 16;
+        let address = SCREEN + (32 * y) + q;
+        // we retrieve value to manipulate
+        let value = Memory.peek(address);
+        // let i = Math.mod(x, 16);
+        let i = x - (q * 16);
+        let value = Screen.setBit(value, i);
+        do Memory.poke(address, value);
+        return;
+    }
+
+    /** set ith bit from left of value to current color (1 or 0)
+    e.g. to set word from 0000 0000 0000 0000 to 1000 0000 0000 0000
+    we or it with 1  = twoToThe[0] writtem from right to left 
+    most significant bit is at the right: 1000 0000 0000 0000 */
+    function int setBit(int value, int i){
+        //change ith bit to 1 e.g. change 2th 1010 | 0100 = 1110 
+        if (color){
+            // let value = (value | twoToThe[i]);
+            let value = (value | Math.powersOfTwo(i));
+        }
+        //change ith bit to 0 e.g. change 3rd 1010 & 0111 = 0010 
+        else {
+            let value = (value & (~(Math.powersOfTwo(i))));
+            // let value = (value & (~(twoToThe[i])));
+        }
+        return value;
+    }
+
+    /**: Draws a line from pixel (x1,y1) to pixel (x2,y2) 
+    using the current color. */
+    function void drawLine(int x1, int y1, int x2, int y2){
+        var int x, y, dx, dy, a, b, diff;
+        let x = x1;
+        let y = y1;
+        let dx = x2-x1;// lines towards E dx>0, lines to W dx<0
+        let dy = y2-y1;// lines towards N dy<0, lines to S dy>0
+        // use counter variables to count how many pixels I went 
+        // into the right x direction (a) and how many y direction (b)
+        let a = 0;
+        let b = 0;
+
+        // special case horizontal line
+        // optimization since frequent usage
+        if (dy = 0){
+            do Screen.drawHorizontal(Math.min(x1, x2), y1, Math.abs(dx));
+            return;
+        }
+
+        // special case vertical line 
+        // optimization since frequent usage
+        if (dx = 0){
+            do Screen.drawVertical(x1, y1, y2);
+            return;
+        }
+
+        // case (both dx, dy negative) or (dx negative and dy positive)
+        // call again with switched points
+        if (((dx < 0) & (dy < 0)) | ((dx < 0) & (dy > 0))){
+            do Screen.drawLine(x2, y2, x1, y1);
+            return;
+        }
+
+        let diff = a * dy - b * dx;
+
+        // case both dx, dy positive
+        if ((dx > 0) & (dy > 0)){
+            while ((a < (dx + 1)) & (b < (dy + 1))){ //there is more work to do
+                do Screen.drawPixel(x+a, y+b);
+                // decide to go right or up
+                if (diff < 0) {
+                    let a = a+1;
+                    let diff = diff + dy;
+                }
+                else {
+                    let b = b+1; 
+                    let diff = diff - dx;
+                }
+            }
+        }
+        // case dx positive, dy negative 
+        else{
+            // use positive a,b with positive dx, dy
+            let dy = Math.abs(dy);
+            while ((a < (dx + 1)) & (b < (dy + 1))){ //there is more work to do
+                do Screen.drawPixel(x+a, y-b);//draw pixel mirrored by x axis
+                // decide to go right or up
+                if (diff<0) {
+                    let a = a+1;
+                    let diff = diff + dy;
+                }
+                else {
+                    let b = b+1; 
+                    let diff = diff - dx;
+                }
+            }
+        }
+        return;
+    }
+
+    /** Draws horizontal lines, dx > 0*/
+    function void drawHorizontal(int x, int y, int dx){
+        var int value, address;
+        if(color){
+            let value = -1;//black 111111...
+        }
+        else{
+            let value = 0;//white 00000...
+        }
+
+        while(dx > -1){
+            // try to avoid drawPixel for longer lines
+            // if (Math.mod(x,16) = 0)
+            if ((x - (x / 16 * 16)) = 0)
+            {
+                let address = SCREEN + (32 * y);//compute base address once
+                while(dx > 15){
+                    do Memory.poke(address + (x/16), value);
+                    let x = x + 16;// increase x by 16
+                    let dx = dx - 16;//decrease dx by 16
+                }
+            }
+            // draw each pixel
+            do Screen.drawPixel(x, y);
+            let x = x+1;
+            let dx = dx-1;
+        }
+        return;
+    }
+
+    /** Draws vertical lines */
+    function void drawVertical(int x, int y1, int y2){
+        var int min_y, max_y;
+        let min_y = Math.min(y1, y2);
+        let max_y = Math.max(y1, y2);
+        while(min_y < (max_y+1)){
+            do Screen.drawPixel(x, min_y);
+            let min_y = min_y+1;
+        }
+        return;
+    }
+
+    /** : Draws a filled rectangle whose top-left corner is (x1,y1) 
+    and bottom-right corner is (x2,y2) using the current color. */
+    function void drawRectangle(int x1, int y1, int x2, int y2){
+        var int y, max_y, min_x, dx;
+        let y = Math.min(y1, y2);
+        let max_y = Math.max(y1, y2);
+        let min_x = Math.min(x1, x2);
+        let dx = Math.abs(x1-x2);
+        // draw a sequence of horizontal lines till y reaches max_y
+        while (y < (max_y + 1)){
+            do Screen.drawHorizontal(min_x, y, dx);
+            let y = y+1;//increment y
+        }
+        return;
+    }
+
+    /**: Draws a filled circle of radius r ≤ 181
+    around (x,y) using the current color. */
+    function void drawCircle(int x, int y, int r){
+        var int dy, side;
+        let dy = -r;
+        // limit r to 181 to avoid overflow 
+        if (r > 181){
+            let r = 181;
+        }
+
+        while(dy < (r+1)){
+            let side = Math.sqrt((r*r)-(dy*dy));
+            do Screen.drawHorizontal(x - side, y + dy, side + side);
+            let dy = dy + 1;
+        }
+        return;
+    }
+}

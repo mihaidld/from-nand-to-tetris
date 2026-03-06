@@ -1,0 +1,172 @@
+function Monster.new 0
+    push constant 5
+    call Memory.alloc 1
+    pop pointer 0
+    push argument 0
+    pop this 0
+    push argument 1
+    pop this 1
+    push argument 2
+    pop this 2
+    push argument 3
+    pop this 4
+    push pointer 0
+    call Monster.setDirection 1
+    pop temp 0
+    push pointer 0
+    call Monster.draw 1
+    pop temp 0
+    push pointer 0
+    return
+function Monster.dispose 0
+    push argument 0
+    pop pointer 0
+    push pointer 0
+    call Memory.deAlloc 1
+    pop temp 0
+    push constant 0
+    return
+function Monster.setDirection 1
+    push argument 0
+    pop pointer 0
+    push constant 2
+    call Random.randRange 1
+    pop local 0
+    push local 0
+    push constant 0
+    eq
+    not
+    if-goto Monster_1
+    push constant 0
+    pop this 3
+    goto Monster_0
+label Monster_1
+label Monster_0
+    push local 0
+    push constant 1
+    eq
+    not
+    if-goto Monster_3
+    push this 4
+    pop this 3
+    goto Monster_2
+label Monster_3
+label Monster_2
+    push local 0
+    push constant 2
+    eq
+    not
+    if-goto Monster_5
+    push this 4
+    neg
+    pop this 3
+    goto Monster_4
+label Monster_5
+label Monster_4
+    push constant 0
+    return
+function Monster.draw 0
+    push argument 0
+    pop pointer 0
+    push constant 1
+    neg
+    call Screen.setColor 1
+    pop temp 0
+    push this 0
+    push this 1
+    push this 2
+    call Screen.drawCircle 3
+    pop temp 0
+    push constant 0
+    return
+function Monster.erase 0
+    push argument 0
+    pop pointer 0
+    push constant 0
+    call Screen.setColor 1
+    pop temp 0
+    push this 0
+    push this 1
+    push this 2
+    call Screen.drawCircle 3
+    pop temp 0
+    push constant 0
+    return
+function Monster.getCenterX 0
+    push argument 0
+    pop pointer 0
+    push this 0
+    return
+function Monster.getCenterY 0
+    push argument 0
+    pop pointer 0
+    push this 1
+    return
+function Monster.getRadius 0
+    push argument 0
+    pop pointer 0
+    push this 2
+    return
+function Monster.move 0
+    push argument 0
+    pop pointer 0
+    push pointer 0
+    call Monster.erase 1
+    pop temp 0
+    push this 1
+    push this 4
+    add
+    pop this 1
+    push this 3
+    push constant 0
+    eq
+    not
+    not
+    if-goto Monster_7
+    push this 0
+    push this 3
+    add
+    pop this 0
+    push this 0
+    push this 2
+    lt
+    not
+    if-goto Monster_9
+    push this 2
+    pop this 0
+    push this 4
+    pop this 3
+    goto Monster_8
+label Monster_9
+label Monster_8
+    push this 0
+    push constant 511
+    push this 2
+    sub
+    gt
+    not
+    if-goto Monster_11
+    push constant 511
+    push this 2
+    sub
+    pop this 0
+    push this 4
+    neg
+    pop this 3
+    goto Monster_10
+label Monster_11
+label Monster_10
+    goto Monster_6
+label Monster_7
+label Monster_6
+    push this 1
+    push constant 255
+    push this 2
+    sub
+    call Math.min 2
+    pop this 1
+    push pointer 0
+    call Monster.draw 1
+    pop temp 0
+    push constant 0
+    return

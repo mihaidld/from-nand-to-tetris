@@ -1,0 +1,385 @@
+function Game.new 0
+    push constant 9
+    call Memory.alloc 1
+    pop pointer 0
+    push constant 40
+    pop this 4
+    push constant 5
+    pop this 5
+    push constant 15
+    pop this 6
+    push constant 3
+    pop this 8
+    push constant 10
+    pop this 7
+    push constant 512
+    push constant 2
+    call Math.divide 2
+    push this 4
+    push constant 2
+    call Math.divide 2
+    sub
+    push constant 255
+    push this 5
+    sub
+    push this 4
+    push this 5
+    call Tray.new 4
+    pop this 0
+    push pointer 0
+    call Game.resetMonster 1
+    pop temp 0
+    push pointer 0
+    call Game.resetToken 1
+    pop temp 0
+    push constant 0
+    pop this 3
+    push pointer 0
+    call Game.printPoints 1
+    pop temp 0
+    push pointer 0
+    return
+function Game.dispose 0
+    push argument 0
+    pop pointer 0
+    push this 0
+    call Tray.dispose 1
+    pop temp 0
+    push this 1
+    call Monster.dispose 1
+    pop temp 0
+    push this 2
+    call Token.dispose 1
+    pop temp 0
+    push pointer 0
+    call Memory.deAlloc 1
+    pop temp 0
+    push constant 0
+    return
+function Game.resetMonster 1
+    push argument 0
+    pop pointer 0
+    push constant 511
+    push constant 2
+    push this 6
+    call Math.multiply 2
+    sub
+    call Random.randRange 1
+    pop local 0
+    push this 6
+    push local 0
+    add
+    push this 6
+    push this 6
+    push this 8
+    call Monster.new 4
+    pop this 1
+    push constant 0
+    return
+function Game.resetToken 1
+    push argument 0
+    pop pointer 0
+    push constant 511
+    push this 7
+    sub
+    call Random.randRange 1
+    pop local 0
+    push local 0
+    push constant 0
+    push this 7
+    call Token.new 3
+    pop this 2
+    push constant 0
+    return
+function Game.printPoints 0
+    push argument 0
+    pop pointer 0
+    push constant 0
+    push constant 0
+    call Output.moveCursor 2
+    pop temp 0
+    push constant 8
+    call String.new 1
+    push constant 80
+    call String.appendChar 2
+    push constant 111
+    call String.appendChar 2
+    push constant 105
+    call String.appendChar 2
+    push constant 110
+    call String.appendChar 2
+    push constant 116
+    call String.appendChar 2
+    push constant 115
+    call String.appendChar 2
+    push constant 58
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    call Output.printString 1
+    pop temp 0
+    push this 3
+    call Output.printInt 1
+    pop temp 0
+    push constant 0
+    return
+function Game.hitMonster 0
+    push argument 0
+    pop pointer 0
+    push this 1
+    call Monster.getCenterX 1
+    push this 1
+    call Monster.getRadius 1
+    add
+    push this 0
+    call Tray.getX 1
+    lt
+    not
+    if-goto Game_1
+    push constant 0
+    return
+    goto Game_0
+label Game_1
+label Game_0
+    push this 0
+    call Tray.getX 1
+    push this 4
+    add
+    push this 1
+    call Monster.getCenterX 1
+    push this 1
+    call Monster.getRadius 1
+    sub
+    lt
+    not
+    if-goto Game_3
+    push constant 0
+    return
+    goto Game_2
+label Game_3
+label Game_2
+    push this 0
+    call Tray.getY 1
+    push this 1
+    call Monster.getCenterY 1
+    push this 1
+    call Monster.getRadius 1
+    add
+    lt
+    return
+function Game.hitToken 0
+    push argument 0
+    pop pointer 0
+    push this 2
+    call Token.getX 1
+    push this 7
+    add
+    push this 0
+    call Tray.getX 1
+    lt
+    not
+    if-goto Game_5
+    push constant 0
+    return
+    goto Game_4
+label Game_5
+label Game_4
+    push this 0
+    call Tray.getX 1
+    push this 4
+    add
+    push this 2
+    call Token.getX 1
+    lt
+    not
+    if-goto Game_7
+    push constant 0
+    return
+    goto Game_6
+label Game_7
+label Game_6
+    push this 0
+    call Tray.getY 1
+    push this 2
+    call Token.getY 1
+    push this 7
+    add
+    lt
+    return
+function Game.monsterBottom 0
+    push argument 0
+    pop pointer 0
+    push this 1
+    call Monster.getCenterY 1
+    push constant 255
+    push this 1
+    call Monster.getRadius 1
+    sub
+    eq
+    return
+function Game.tokenBottom 0
+    push argument 0
+    pop pointer 0
+    push this 2
+    call Token.getY 1
+    push constant 255
+    push this 7
+    sub
+    eq
+    return
+function Game.increaseDifficulty 0
+    push argument 0
+    pop pointer 0
+    push this 8
+    push constant 1
+    add
+    pop this 8
+    push this 6
+    push constant 1
+    add
+    pop this 6
+    push constant 0
+    return
+function Game.moveSprites 0
+    push argument 0
+    pop pointer 0
+    push this 0
+    call Tray.move 1
+    pop temp 0
+    push this 1
+    call Monster.move 1
+    pop temp 0
+    push this 2
+    call Token.move 1
+    pop temp 0
+    push constant 0
+    return
+function Game.run 2
+    push argument 0
+    pop pointer 0
+    push constant 0
+    pop local 1
+label Game_8
+    push local 1
+    not
+    not
+    if-goto Game_9
+    call Keyboard.keyPressed 0
+    pop local 0
+    push local 0
+    push constant 113
+    eq
+    not
+    if-goto Game_11
+    push constant 1
+    neg
+    pop local 1
+    goto Game_10
+label Game_11
+label Game_10
+    push local 0
+    push constant 0
+    eq
+    not
+    if-goto Game_13
+    push this 0
+    push constant 0
+    call Tray.setDirection 2
+    pop temp 0
+    goto Game_12
+label Game_13
+label Game_12
+    push local 0
+    push constant 130
+    eq
+    not
+    if-goto Game_15
+    push this 0
+    push constant 1
+    neg
+    call Tray.setDirection 2
+    pop temp 0
+    goto Game_14
+label Game_15
+label Game_14
+    push local 0
+    push constant 132
+    eq
+    not
+    if-goto Game_17
+    push this 0
+    push constant 1
+    call Tray.setDirection 2
+    pop temp 0
+    goto Game_16
+label Game_17
+label Game_16
+    push pointer 0
+    call Game.moveSprites 1
+    pop temp 0
+    push pointer 0
+    call Game.hitMonster 1
+    not
+    if-goto Game_19
+    push constant 1
+    neg
+    pop local 1
+    goto Game_18
+label Game_19
+label Game_18
+    push pointer 0
+    call Game.hitToken 1
+    not
+    if-goto Game_21
+    push this 3
+    push constant 1
+    add
+    pop this 3
+    push pointer 0
+    call Game.printPoints 1
+    pop temp 0
+    push this 2
+    call Token.erase 1
+    pop temp 0
+    push pointer 0
+    call Game.resetToken 1
+    pop temp 0
+    push pointer 0
+    call Game.increaseDifficulty 1
+    pop temp 0
+    goto Game_20
+label Game_21
+label Game_20
+    push pointer 0
+    call Game.monsterBottom 1
+    not
+    if-goto Game_23
+    push this 1
+    call Monster.erase 1
+    pop temp 0
+    push pointer 0
+    call Game.resetMonster 1
+    pop temp 0
+    goto Game_22
+label Game_23
+label Game_22
+    push pointer 0
+    call Game.tokenBottom 1
+    not
+    if-goto Game_25
+    push this 2
+    call Token.erase 1
+    pop temp 0
+    push pointer 0
+    call Game.resetToken 1
+    pop temp 0
+    goto Game_24
+label Game_25
+label Game_24
+    push constant 10
+    call Sys.wait 1
+    pop temp 0
+    goto Game_8
+label Game_9
+    push constant 0
+    return

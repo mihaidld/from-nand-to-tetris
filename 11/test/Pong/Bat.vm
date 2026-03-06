@@ -1,0 +1,468 @@
+// compile_class
+// compile_class_var_dec
+// compile_class_var_dec
+// compile_class_var_dec
+// compile_subroutine_dec type constructor
+// compile_parameter_list
+// compile_subroutine_body
+function Bat.new 0
+push constant 5
+call Memory.alloc 1
+pop pointer 0
+// compile_statements
+// compile_let
+// compile_expression
+// compile_term
+push argument 0
+pop this 0
+// compile_let
+// compile_expression
+// compile_term
+push argument 1
+pop this 1
+// compile_let
+// compile_expression
+// compile_term
+push argument 2
+pop this 2
+// compile_let
+// compile_expression
+// compile_term
+push argument 3
+pop this 3
+// compile_let
+// compile_expression
+// compile_term
+push constant 2
+pop this 4
+// compile_do
+// compile_expression
+// compile_term
+push pointer 0
+// compile_expression_list
+call Bat.show 1
+pop temp 0
+// compile_return
+// compile_expression
+// compile_term
+push pointer 0
+return
+// compile_subroutine_dec type method
+// compile_parameter_list
+// compile_subroutine_body
+function Bat.dispose 0
+push argument 0
+pop pointer 0
+// compile_statements
+// compile_do
+// compile_expression
+// compile_term
+// compile_expression_list
+// compile_expression
+// compile_term
+push pointer 0
+call Memory.deAlloc 1
+pop temp 0
+// compile_return
+push constant 0
+return
+// compile_subroutine_dec type method
+// compile_parameter_list
+// compile_subroutine_body
+function Bat.show 0
+push argument 0
+pop pointer 0
+// compile_statements
+// compile_do
+// compile_expression
+// compile_term
+// compile_expression_list
+// compile_expression
+// compile_term
+push constant 1
+neg
+call Screen.setColor 1
+pop temp 0
+// compile_do
+// compile_expression
+// compile_term
+push pointer 0
+// compile_expression_list
+call Bat.draw 1
+pop temp 0
+// compile_return
+push constant 0
+return
+// compile_subroutine_dec type method
+// compile_parameter_list
+// compile_subroutine_body
+function Bat.hide 0
+push argument 0
+pop pointer 0
+// compile_statements
+// compile_do
+// compile_expression
+// compile_term
+// compile_expression_list
+// compile_expression
+// compile_term
+push constant 0
+call Screen.setColor 1
+pop temp 0
+// compile_do
+// compile_expression
+// compile_term
+push pointer 0
+// compile_expression_list
+call Bat.draw 1
+pop temp 0
+// compile_return
+push constant 0
+return
+// compile_subroutine_dec type method
+// compile_parameter_list
+// compile_subroutine_body
+function Bat.draw 0
+push argument 0
+pop pointer 0
+// compile_statements
+// compile_do
+// compile_expression
+// compile_term
+// compile_expression_list
+// compile_expression
+// compile_term
+push this 0
+// compile_expression
+// compile_term
+push this 1
+// compile_expression
+// compile_term
+push this 0
+// compile_term
+push this 2
+add
+// compile_expression
+// compile_term
+push this 1
+// compile_term
+push this 3
+add
+call Screen.drawRectangle 4
+pop temp 0
+// compile_return
+push constant 0
+return
+// compile_subroutine_dec type method
+// compile_parameter_list
+// compile_subroutine_body
+function Bat.setDirection 0
+push argument 0
+pop pointer 0
+// compile_statements
+// compile_let
+// compile_expression
+// compile_term
+push argument 1
+pop this 4
+// compile_return
+push constant 0
+return
+// compile_subroutine_dec type method
+// compile_parameter_list
+// compile_subroutine_body
+function Bat.getLeft 0
+push argument 0
+pop pointer 0
+// compile_statements
+// compile_return
+// compile_expression
+// compile_term
+push this 0
+return
+// compile_subroutine_dec type method
+// compile_parameter_list
+// compile_subroutine_body
+function Bat.getRight 0
+push argument 0
+pop pointer 0
+// compile_statements
+// compile_return
+// compile_expression
+// compile_term
+push this 0
+// compile_term
+push this 2
+add
+return
+// compile_subroutine_dec type method
+// compile_parameter_list
+// compile_subroutine_body
+function Bat.setWidth 0
+push argument 0
+pop pointer 0
+// compile_statements
+// compile_do
+// compile_expression
+// compile_term
+push pointer 0
+// compile_expression_list
+call Bat.hide 1
+pop temp 0
+// compile_let
+// compile_expression
+// compile_term
+push argument 1
+pop this 2
+// compile_do
+// compile_expression
+// compile_term
+push pointer 0
+// compile_expression_list
+call Bat.show 1
+pop temp 0
+// compile_return
+push constant 0
+return
+// compile_subroutine_dec type method
+// compile_parameter_list
+// compile_subroutine_body
+function Bat.move 0
+push argument 0
+pop pointer 0
+// compile_statements
+// compile_if
+// compile_expression
+// compile_term
+push this 4
+// compile_term
+push constant 1
+eq
+not
+if-goto Bat_L1_1
+// compile_statements
+// compile_let
+// compile_expression
+// compile_term
+push this 0
+// compile_term
+push constant 4
+sub
+pop this 0
+// compile_if
+// compile_expression
+// compile_term
+push this 0
+// compile_term
+push constant 0
+lt
+not
+if-goto Bat_L1_2
+// compile_statements
+// compile_let
+// compile_expression
+// compile_term
+push constant 0
+pop this 0
+goto Bat_L2_2
+label Bat_L1_2
+label Bat_L2_2
+// compile_do
+// compile_expression
+// compile_term
+// compile_expression_list
+// compile_expression
+// compile_term
+push constant 0
+call Screen.setColor 1
+pop temp 0
+// compile_do
+// compile_expression
+// compile_term
+// compile_expression_list
+// compile_expression
+// compile_term
+// compile_expression
+// compile_term
+push this 0
+// compile_term
+push this 2
+add
+// compile_term
+push constant 1
+add
+// compile_expression
+// compile_term
+push this 1
+// compile_expression
+// compile_term
+// compile_expression
+// compile_term
+push this 0
+// compile_term
+push this 2
+add
+// compile_term
+push constant 4
+add
+// compile_expression
+// compile_term
+push this 1
+// compile_term
+push this 3
+add
+call Screen.drawRectangle 4
+pop temp 0
+// compile_do
+// compile_expression
+// compile_term
+// compile_expression_list
+// compile_expression
+// compile_term
+push constant 1
+neg
+call Screen.setColor 1
+pop temp 0
+// compile_do
+// compile_expression
+// compile_term
+// compile_expression_list
+// compile_expression
+// compile_term
+push this 0
+// compile_expression
+// compile_term
+push this 1
+// compile_expression
+// compile_term
+push this 0
+// compile_term
+push constant 3
+add
+// compile_expression
+// compile_term
+push this 1
+// compile_term
+push this 3
+add
+call Screen.drawRectangle 4
+pop temp 0
+goto Bat_L2_1
+label Bat_L1_1
+// compile_statements
+// compile_let
+// compile_expression
+// compile_term
+push this 0
+// compile_term
+push constant 4
+add
+pop this 0
+// compile_if
+// compile_expression
+// compile_term
+// compile_expression
+// compile_term
+push this 0
+// compile_term
+push this 2
+add
+// compile_term
+push constant 511
+gt
+not
+if-goto Bat_L1_3
+// compile_statements
+// compile_let
+// compile_expression
+// compile_term
+push constant 511
+// compile_term
+push this 2
+sub
+pop this 0
+goto Bat_L2_3
+label Bat_L1_3
+label Bat_L2_3
+// compile_do
+// compile_expression
+// compile_term
+// compile_expression_list
+// compile_expression
+// compile_term
+push constant 0
+call Screen.setColor 1
+pop temp 0
+// compile_do
+// compile_expression
+// compile_term
+// compile_expression_list
+// compile_expression
+// compile_term
+push this 0
+// compile_term
+push constant 4
+sub
+// compile_expression
+// compile_term
+push this 1
+// compile_expression
+// compile_term
+push this 0
+// compile_term
+push constant 1
+sub
+// compile_expression
+// compile_term
+push this 1
+// compile_term
+push this 3
+add
+call Screen.drawRectangle 4
+pop temp 0
+// compile_do
+// compile_expression
+// compile_term
+// compile_expression_list
+// compile_expression
+// compile_term
+push constant 1
+neg
+call Screen.setColor 1
+pop temp 0
+// compile_do
+// compile_expression
+// compile_term
+// compile_expression_list
+// compile_expression
+// compile_term
+// compile_expression
+// compile_term
+push this 0
+// compile_term
+push this 2
+add
+// compile_term
+push constant 3
+sub
+// compile_expression
+// compile_term
+push this 1
+// compile_expression
+// compile_term
+push this 0
+// compile_term
+push this 2
+add
+// compile_expression
+// compile_term
+push this 1
+// compile_term
+push this 3
+add
+call Screen.drawRectangle 4
+pop temp 0
+label Bat_L2_1
+// compile_return
+push constant 0
+return

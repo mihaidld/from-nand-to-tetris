@@ -1,0 +1,36 @@
+// compile_class
+// compile_subroutine_dec type function
+// compile_parameter_list
+// compile_subroutine_body
+// compile_var_dec
+function Main.main 1
+// compile_statements
+// compile_do
+// compile_expression
+// compile_term
+// compile_expression_list
+call PongGame.newInstance 0
+pop temp 0
+// compile_let
+// compile_expression
+// compile_term
+// compile_expression_list
+call PongGame.getInstance 0
+pop local 0
+// compile_do
+// compile_expression
+// compile_term
+push local 0
+// compile_expression_list
+call PongGame.run 1
+pop temp 0
+// compile_do
+// compile_expression
+// compile_term
+push local 0
+// compile_expression_list
+call PongGame.dispose 1
+pop temp 0
+// compile_return
+push constant 0
+return

@@ -1,0 +1,51 @@
+/** Fractions */
+class Fraction {
+    field int numerator, denominator;
+
+    /** Constructs reduced fraction */
+    constructor Fraction new(int x, int y){
+        let numerator = x; let denominator = y;
+        do reduce();//reduces the fraction
+        return this;//returns base adrress of newly created object
+    }
+    /** method operates on current object */
+    method void reduce(){
+        var int g;
+        let g = Math.gcd(numerator, denominator);
+        if (g > 1) {let numerator = numerator / g; let denominator = denominator / g;}
+        return;
+    }
+
+    /** Accesors only way to access field values from 
+    outside the class*/
+    method int getNumerator(){
+        return numerator;
+    }
+    method int getDenominator(){
+        return denominator;
+    }
+
+
+    /** Sum of this fraction and other one */
+    method Fraction plus(Fraction other){
+        var int sumNumerators;
+        let sumNumerators = (numerator * other.getDenominator()) + (other.getNumerator() * denominator);
+        return Fraction.new(sumNumerators, denominator * other.getDenominator());
+    }
+
+    /** Disposes this fraction: client can free up memory ressources used by instance
+    all memory occupied starting with reference to object stored in this
+    Necessary since no garbage collection in Jack*/
+    method void dispose(){
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    /** Prints in format x/y*/
+    method void print(){
+        do Output.printInt(numerator); 
+        do Output.printString("/");
+        do Output.printInt(denominator);
+        return;
+    }   
+}

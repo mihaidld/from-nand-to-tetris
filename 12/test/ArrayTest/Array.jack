@@ -1,0 +1,18 @@
+/** In the Jack language, arrays are implemented as instances of 
+the OS class Array. 
+Once declared, the array elements can be accessed using the syntax arr[i]. 
+Jack arrays are not typed: each array element can hold a primitive 
+data type or an object type, and different elements in the same array 
+can have different types. */
+class Array{
+    /** Constructs a new array of the given size.*/
+    function Array new(int size){
+        return Memory.alloc(size); 
+    }
+
+    /** Disposes this array.*/
+    method void dispose(){
+        do Memory.deAlloc(this);
+        return;
+    }
+}

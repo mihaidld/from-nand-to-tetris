@@ -1,0 +1,373 @@
+VM -> hack assembly
+add
+sub
+neg
+eq
+gt
+lt
+and
+or
+not
+
+push segment i
+pop segment i
+
+label labelName
+goto labelName
+if-goto labelName
+
+function functionName nVars
+call functionName nVars
+return 
+
+push constant i
+@i
+D=A // D = i
+@SP
+AM=M+1 // SP++
+A=A-1 //correct previous increase (A=M)
+M=D // *SP = i
+
+// addr = segmentPointer{LCL, ARG, THIS, THAT} + i, *addr = *SP, SP--
+pop local i
+@LCL
+D=M // D = LCL
+@i
+D=D+A // D = LCL+i
+@addr or R13, R14, R15
+M=D // addr = LCL + i
+@SP
+AM=M-1 // SP--
+D=M // D == popped value from stack
+@addr or @R13
+A=M
+M=D // *addr = *SP
+
+push local i  addr = LCL + i, *SP = *addr, SP++
+@LCL
+D=M // D = LCL
+@i
+D=D+A // D = LCL+i
+@addr
+AM=D // addr = LCL + i
+D=M // D = *addr
+@SP
+AM=M+1 // SP++
+A=A-1 //correct previous increase (A=M)
+M=D // *SP = *addr
+
+(Foo.vm) static i -> Foo.i
+@SP
+AM=M-1 // SP--
+D=M // D == popped value from stack
+@Foo.i
+M=D
+
+push temp i -> RAM[5]-RAM[12]
+addr = 5 + i, *SP = *addr, SP++
+addr = 5 + i, SP--, *addr = *SP
+
+push temp 6
+@11
+D=M // D = RAM11
+@SP
+AM=M+1 // SP++
+A=A-1 //correct previous increase (A=M)
+M=D // *SP = RAM11
+
+pop temp 6
+@SP
+AM=M-1 // SP--
+D=M // D == popped value from stack
+@11
+M=D 
+
+add
+@SP
+AM=M-1 // SP-- and check (set address) towards first operand
+D=M // D=top of stack
+A=A-1 // check 2nd on stack
+M=D+M// replace 2nd with their sum
+
+sub
+@SP
+AM=M-1 // SP-- and check (set address) towards first operand
+D=M // D=top of stack
+A=A-1 // check 2nd on stack
+M=M-D// replace 2nd with difference 2nd (added before in the stack) - one on top
+
+eq
+@SP
+AM=M-1 // SP-- and check (set address) towards first operand
+D=M // D=top of stack
+A=A-1 // check 2nd on stack
+D=M-D// D = 0 if equal
+@TRUEi
+D;JEQ // jump to label TRUEi
+@SP
+A=M-1
+M=0 // 0 (False) since not equal
+@STOPi // if false jumps to label STOPi to avoid true case
+0;JMP
+(TRUEi)
+@SP
+A=M-1
+M=-1 // -1 (True all 1's) since equal
+(STOPi)
+
+
+gt
+@SP
+AM=M-1 // SP-- and check (set address) towards first operand
+D=M // D=top of stack
+A=A-1 // check 2nd on stack
+@TRUEj
+D=M-D// D > 0 if greater than
+D;JGT // jump to label TRUEj
+@SP
+A=M
+M=0 // 0 (False) since not equal
+@STOPj
+0;JMP
+(TRUEj)
+@SP
+A=M
+M=-1 // -1 (True) since equal
+(STOPj)
+
+and
+@SP
+AM=M-1 // SP-- and check (set address) towards first operand
+D=M // D=top of stack
+A=A-1 // check 2nd on stack
+M=D&M// replace 2nd with their anding
+
+not
+@SP
+A=M-1 // check (set address) towards first operand
+M=!M // negate top of stack
+
+
+pointer 0 -> THIS, pointer 1 -> THAT
+push pointer 0: *SP = THIS, SP++
+pop pointer 1: SP--, THAT = *SP
+
+pop pointer 0
+@SP
+AM=M-1 // SP--
+D=M
+@3
+M=D // RAM3=*SP
+
+
+label labelName
+(label)
+
+unconditional jump
+goto labelName
+@labelName
+0;JMP
+
+conditional jump // pop condition from top of stack and evaluate it to jump
+if-goto labelName
+@SP
+AM=M-1 // SP-- and check (set address) towards first operand
+D=M // D=top of stack, if it’s not false (0) go there
+@labelName
+D;JNE
+
+
+function functionName 2 // declare function functionName which will need 2 local variables
+so local 0 and local 1 are initialized to 0 in the functionName stack
+has also access to argument segment variables provided when calling function
+repeat nVars:
+    push constant 0
+
+function foo 2
+(foo) // label to get here when calling foo
+Set up function execution: repeat nLocalVars times: 
+push 0 
+
+No need to setup LCL or ARG which were set up by call
+
+Call
+
+call functionName 3 // within function Main call functionName with 3 arguments from top of stack
+these 3 popped from stack will pe replaced by return value of function call on Main's stack
+1. pass arguments from caller to callee (pop towards argument 0, 1, 2)
+2. determine return address (where execution of caller has paused and should continue it when gets return value)
+3. save this return address in memory and current state of caller (stack, memory segments)
+4. jump to execute callee instructions
+
+function Foo.main
+...
+call Bar.mult 3
+set pointer stored by arg segment (RAM2) to base address of 1st argument (argument 0)
+so callee accesses argument 0, 1, 2
+push to the stack of caller caller's frame (return address, saved LCL, saved ARG, 
+saved THIS, saved THAT) so advance SP by 5 then jump to execute callee
+
+Steps:
+push returnAddress (using label declared below)
+push LCL
+push ARG
+push THIS
+push THAT so SP advances by 5
+reposition ARG for callee: ARG = SP - 5 -nArgs
+reposition LCL: LCL = SP
+goto functionName
+declare label for returnAddress: (returnAddress)
+
+
+@foo$ret0 D=A  followed by pushing D onto the stack 
+@foo$ret0
+D=A
+
+@SP
+AM=M+1
+A=A-1
+M=D
+
+@LCL // save current LCL
+D=M // D = current LCL
+@SP
+AM=M+1 // SP++
+A=A-1 //correct previous increase (A=M)
+M=D // *SP = current LCL
+@ARG // save current ARG
+D=M // D = current ARG
+@SP
+AM=M+1 // SP++
+A=A-1 //correct previous increase (A=M)
+M=D // *SP = current ARG
+@THIS // save current THIS
+D=M // D = current THIS
+@SP
+AM=M+1 // SP++
+A=A-1 //correct previous increase (A=M)
+M=D // *SP = current THIS
+@THAT // save current THAT
+D=M // D = current THAT
+@SP
+AM=M+1 // SP++
+A=A-1 //correct previous increase (A=M)
+M=D // *SP = current THAT
+
+@(5+nArgs)
+D=A // D=5+nArgs
+@SP
+D=M-D // D=SP-5-nArgs
+@ARG
+M=D//ARG = SP-5-nArgs
+@SP
+D=M
+@LCL
+M=D //LCL=SP
+@foo// jump to execute function foo's code
+0; JMP
+(Foo$ret.1) // saves return address when callee returns  via label declaration
+...
+
+
+return // At the end functionName's stack has top value that is returned
+1. return to caller value computed by callee (must have a top value on stack before return)
+must push it on the stack of caller (after poping the arguments)
+2. recycle ressources used by callee (stack, memory segments)
+3. recreate state of caller (stack, memory segments)
+4. jump to return address in caller code
+
+Steps:
+endFrame = LCL // temporary variable
+returnAddress = *(endFrame - 5)// gets return address. another temporary variable
+*ARG=pop() // reposition return value for caller, replace argument 0 with top of stack
+SP=ARG+1 //reposition SP of caller
+THAT=*(endFrame - 1)//restore THAT for caller
+THIS=*(endFrame - 2)//restore THIS for caller
+ARG=*(endFrame - 3)//restore ARG for caller
+LCL=*(endFrame - 4)//restore LCL for caller
+goto returnAddress //go to return address in caller's code
+
+@LCL
+D=M
+@R13
+M=D //endFrame (R13) = LCL
+@5
+
+D=A
+@R13
+D=M-D //D=endFrame-5
+A=D
+D=M//D=*(endFrame-5)
+
+@R14
+M=D//returnAddress (R14) = *(endFrame - 5)
+pop argument 0
+@ARG
+D=M+1
+@SP
+M=D//SP=ARG+1
+
+@1
+
+D=A
+@R13
+D=M-D //D=endFrame-1
+A=D
+D=M//D=*(endFrame-1)
+
+@THAT
+M=D
+
+@2
+
+D=A
+@R13
+D=M-D //D=endFrame-2
+A=D
+D=M//D=*(endFrame-2)
+
+@THIS
+M=D
+
+@3
+
+D=A
+@R13
+D=M-D //D=endFrame-3
+A=D
+D=M//D=*(endFrame-3)
+
+@ARG
+M=D
+
+@4
+
+D=A
+@R13
+D=M-D //D=endFrame-4
+A=D
+D=M//D=*(endFrame-4)
+
+@LCL
+M=D
+
+@R13
+A=M
+0;JMP
+
+
+Bootstrap code to put ROM beginning at address 0
+SP=256
+Call Sys.init // call Sys.init from OS without args, which will call Main.main (main function from Main.vm file)
+
+@256
+D=A
+@SP
+M=D
+...
+
+Label conventions:
+functionName -> (<filename>.<functionName>) e.g. Main.foo
+label inside functioName -> (<filename>.<functionName>$<labelName>) e.g. Main.foo$bar
+internal label inside functioName (e.g. for if-else)-> (<filename>.<functionName>$<labelName>) e.g. Main.foo$bar
+return address inside functionname (for call) -> (<filename>.<functionName>$ret.<counter>) e.g. Main.foo$ret.0, Main.foo$ret.1

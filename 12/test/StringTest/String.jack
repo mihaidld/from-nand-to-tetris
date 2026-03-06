@@ -1,0 +1,190 @@
+/** This class represents strings of char values and 
+provides commonly needed string processing services. 
+Represents a String object. Implements the String type*/
+class String{
+    field Array str;
+    field int length, maxLength;// actual length and maximum length
+
+    /** Constructs a new empty string with a maximum length 
+    of maxLength and initial length of 0. */
+    constructor String new(int maxL){
+        if(maxL>0){
+            let str = Array.new(maxL);
+        }
+        let length = 0;
+        let maxLength = maxL;
+        return this;
+    }
+    /** Disposes this string: de-allocates it*/
+    method void dispose(){
+        if(maxLength>0){
+            do str.dispose();// not empty string
+        }
+        do Memory.deAlloc(this);
+        return;
+    }
+    /** Returns the number of characters in this string.*/
+    method int length(){
+        return length;
+    }
+    /** Returns the character at the i-th location of this string.*/
+    method char charAt(int i){
+        if (i < maxLength){
+            return str[i];
+        }
+        else{
+            return 0;//0: out of bounds
+        }
+    }
+    /** Sets the character at the i-th location of this string to c.*/
+    method void setCharAt(int i, char c){
+        if (i < maxLength){
+            let str[i] = c;
+        }
+        return;
+    }
+
+    /** Appends c to this string’s end and returns this string.*/
+    method String appendChar(char c){
+        if (length < maxLength){
+            let str[length] = c;
+            let length = length + 1;
+        }
+        return this;
+    }
+
+    /**Erases the last character from this string.
+    array elements beyond length are not considered part of the string*/
+    method void eraseLastChar(){
+        if (length > 0){
+            // let str[length-1] = 0;;//replace last char with 0
+            let length = length - 1;
+        }
+        return;
+    }
+
+    /** Returns the integer value of this string until a non-digit
+    character is detected.
+    str -> int
+    e.g. '123a' -> 123*/
+    method int intValue(){
+        var int val, i, d, sign;
+        let val = 0;
+        let i = 0;
+        let sign = 1;
+        // handle '-' sign
+        if ((length > 0) & (str[i] = 45)){
+            let sign = -1;
+            let i = i+1;
+        }
+        while (i < length){
+            // check if current char is digit (from 48 to 57)
+            if ((47 < str[i]) & (str[i] < 58)){
+                let d = str[i] - 48;// integer value of str[i]
+                let val = (val * 10) + d;
+                let i = i+1;
+            }
+            //encountered non-digit
+            else {
+                return (val*sign);
+            }
+        } 
+        return (val*sign);
+    }
+
+    /** Sets this string to hold a representation of the given value.
+    int -> str
+    e.g. 123 -> '123' so from one word to 3 words each holding ASCII 
+    code of the digits*/
+    method void setInt(int val){
+        var int divisor, q;
+        var boolean toPrint;
+
+        // first delete all chars of current string
+        let length = 0;
+        // handle negative int
+        if (val < 0){
+            do appendChar(45);
+            let val = -val;
+        }
+
+        // print from the left starting with first non-zero digit 
+        let divisor = 10000;
+        let toPrint = false;
+        // max int has 5 digits
+        // 5 iteration for divisors 10000, 1000, 100, 10, 1
+        while (divisor > 0){
+            let q = val / divisor;
+            if (q > 0){
+                let toPrint = true;
+            }
+            if (toPrint){
+                do appendChar(q + 48);
+            }
+            
+            let val = val - (q * divisor);
+            let divisor = divisor / 10;
+        }
+    
+        return;
+    }
+
+    /** Sets this string to hold a representation of the given value.
+    int -> str
+    e.g. 123 -> '123' so from one word to 3 words each holding ASCII 
+    code of the digits*/
+    // method void setInt(int val){
+    //     var String intStr;
+    //     var int i;
+    //     // first delete all chars of current string
+    //     let length = 0;
+    //     // handle negative int
+    //     if (val < 0){
+    //         do appendChar(45);
+    //         let val = -val;
+    //     }
+    //     // use helper function int2String for positive int
+    //     let intStr = String.int2String(val);
+        
+    //     // copy chars from intStr to current string
+    //     let i = 0;
+    //     while(i < intStr.length()){
+    //         do appendChar(intStr[i]);
+    //         let i = i + 1;
+    //     }
+    //     return;
+    // }
+
+    // /** Converts int -> str, when int >= 0 */
+    // function String int2String(int val){
+    //     var int lastDigit, c;
+    //     // var char c;
+    //     var String strNew;
+    //     let strNew = String.new(5);// max int is 2^15 = 32767
+    //     // without Math.mod
+    //     let lastDigit = val - ((val/10) * 10);
+    //     // digits have index from 48 (0) to 57 (9)
+    //     let c = lastDigit + 48;
+    //     if (val > 9){
+    //         // chop off last digit through integer division 
+    //         // to shorten value and recursive call to get digits before c
+    //         let strNew = String.int2String(val / 10);
+    //     }
+    //     return strNew.appendChar(c);
+    // }
+
+    /** Returns the backspace character.*/
+    function char backSpace(){
+        return 129;
+    }
+    /** Returns the double quote character.*/
+    function char doubleQuote(){
+        return 34;
+    }
+
+    /** Returns the newline character.*/
+    function char newLine(){
+        return 128;
+    }
+
+}

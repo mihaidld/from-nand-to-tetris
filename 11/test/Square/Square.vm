@@ -1,0 +1,688 @@
+// compile_class
+// compile_class_var_dec
+// compile_class_var_dec
+// compile_subroutine_dec type constructor
+// compile_parameter_list
+// compile_subroutine_body
+function Square.new 0
+push constant 3
+call Memory.alloc 1
+pop pointer 0
+// compile_statements
+// compile_let
+// compile_expression
+// compile_term
+push argument 0
+pop this 0
+// compile_let
+// compile_expression
+// compile_term
+push argument 1
+pop this 1
+// compile_let
+// compile_expression
+// compile_term
+push argument 2
+pop this 2
+// compile_do
+// compile_expression
+// compile_term
+push pointer 0
+// compile_expression_list
+call Square.draw 1
+pop temp 0
+// compile_return
+// compile_expression
+// compile_term
+push pointer 0
+return
+// compile_subroutine_dec type method
+// compile_parameter_list
+// compile_subroutine_body
+function Square.dispose 0
+push argument 0
+pop pointer 0
+// compile_statements
+// compile_do
+// compile_expression
+// compile_term
+// compile_expression_list
+// compile_expression
+// compile_term
+push pointer 0
+call Memory.deAlloc 1
+pop temp 0
+// compile_return
+push constant 0
+return
+// compile_subroutine_dec type method
+// compile_parameter_list
+// compile_subroutine_body
+function Square.draw 0
+push argument 0
+pop pointer 0
+// compile_statements
+// compile_do
+// compile_expression
+// compile_term
+// compile_expression_list
+// compile_expression
+// compile_term
+push constant 1
+neg
+call Screen.setColor 1
+pop temp 0
+// compile_do
+// compile_expression
+// compile_term
+// compile_expression_list
+// compile_expression
+// compile_term
+push this 0
+// compile_expression
+// compile_term
+push this 1
+// compile_expression
+// compile_term
+push this 0
+// compile_term
+push this 2
+add
+// compile_expression
+// compile_term
+push this 1
+// compile_term
+push this 2
+add
+call Screen.drawRectangle 4
+pop temp 0
+// compile_return
+push constant 0
+return
+// compile_subroutine_dec type method
+// compile_parameter_list
+// compile_subroutine_body
+function Square.erase 0
+push argument 0
+pop pointer 0
+// compile_statements
+// compile_do
+// compile_expression
+// compile_term
+// compile_expression_list
+// compile_expression
+// compile_term
+push constant 0
+call Screen.setColor 1
+pop temp 0
+// compile_do
+// compile_expression
+// compile_term
+// compile_expression_list
+// compile_expression
+// compile_term
+push this 0
+// compile_expression
+// compile_term
+push this 1
+// compile_expression
+// compile_term
+push this 0
+// compile_term
+push this 2
+add
+// compile_expression
+// compile_term
+push this 1
+// compile_term
+push this 2
+add
+call Screen.drawRectangle 4
+pop temp 0
+// compile_return
+push constant 0
+return
+// compile_subroutine_dec type method
+// compile_parameter_list
+// compile_subroutine_body
+function Square.incSize 0
+push argument 0
+pop pointer 0
+// compile_statements
+// compile_if
+// compile_expression
+// compile_term
+// compile_expression
+// compile_term
+// compile_expression
+// compile_term
+push this 1
+// compile_term
+push this 2
+add
+// compile_term
+push constant 254
+lt
+// compile_term
+// compile_expression
+// compile_term
+// compile_expression
+// compile_term
+push this 0
+// compile_term
+push this 2
+add
+// compile_term
+push constant 510
+lt
+and
+not
+if-goto Square_L1_1
+// compile_statements
+// compile_do
+// compile_expression
+// compile_term
+push pointer 0
+// compile_expression_list
+call Square.erase 1
+pop temp 0
+// compile_let
+// compile_expression
+// compile_term
+push this 2
+// compile_term
+push constant 2
+add
+pop this 2
+// compile_do
+// compile_expression
+// compile_term
+push pointer 0
+// compile_expression_list
+call Square.draw 1
+pop temp 0
+goto Square_L2_1
+label Square_L1_1
+label Square_L2_1
+// compile_return
+push constant 0
+return
+// compile_subroutine_dec type method
+// compile_parameter_list
+// compile_subroutine_body
+function Square.decSize 0
+push argument 0
+pop pointer 0
+// compile_statements
+// compile_if
+// compile_expression
+// compile_term
+push this 2
+// compile_term
+push constant 2
+gt
+not
+if-goto Square_L1_2
+// compile_statements
+// compile_do
+// compile_expression
+// compile_term
+push pointer 0
+// compile_expression_list
+call Square.erase 1
+pop temp 0
+// compile_let
+// compile_expression
+// compile_term
+push this 2
+// compile_term
+push constant 2
+sub
+pop this 2
+// compile_do
+// compile_expression
+// compile_term
+push pointer 0
+// compile_expression_list
+call Square.draw 1
+pop temp 0
+goto Square_L2_2
+label Square_L1_2
+label Square_L2_2
+// compile_return
+push constant 0
+return
+// compile_subroutine_dec type method
+// compile_parameter_list
+// compile_subroutine_body
+function Square.moveUp 0
+push argument 0
+pop pointer 0
+// compile_statements
+// compile_if
+// compile_expression
+// compile_term
+push this 1
+// compile_term
+push constant 1
+gt
+not
+if-goto Square_L1_3
+// compile_statements
+// compile_do
+// compile_expression
+// compile_term
+// compile_expression_list
+// compile_expression
+// compile_term
+push constant 0
+call Screen.setColor 1
+pop temp 0
+// compile_do
+// compile_expression
+// compile_term
+// compile_expression_list
+// compile_expression
+// compile_term
+push this 0
+// compile_expression
+// compile_term
+// compile_expression
+// compile_term
+push this 1
+// compile_term
+push this 2
+add
+// compile_term
+push constant 1
+sub
+// compile_expression
+// compile_term
+push this 0
+// compile_term
+push this 2
+add
+// compile_expression
+// compile_term
+push this 1
+// compile_term
+push this 2
+add
+call Screen.drawRectangle 4
+pop temp 0
+// compile_let
+// compile_expression
+// compile_term
+push this 1
+// compile_term
+push constant 2
+sub
+pop this 1
+// compile_do
+// compile_expression
+// compile_term
+// compile_expression_list
+// compile_expression
+// compile_term
+push constant 1
+neg
+call Screen.setColor 1
+pop temp 0
+// compile_do
+// compile_expression
+// compile_term
+// compile_expression_list
+// compile_expression
+// compile_term
+push this 0
+// compile_expression
+// compile_term
+push this 1
+// compile_expression
+// compile_term
+push this 0
+// compile_term
+push this 2
+add
+// compile_expression
+// compile_term
+push this 1
+// compile_term
+push constant 1
+add
+call Screen.drawRectangle 4
+pop temp 0
+goto Square_L2_3
+label Square_L1_3
+label Square_L2_3
+// compile_return
+push constant 0
+return
+// compile_subroutine_dec type method
+// compile_parameter_list
+// compile_subroutine_body
+function Square.moveDown 0
+push argument 0
+pop pointer 0
+// compile_statements
+// compile_if
+// compile_expression
+// compile_term
+// compile_expression
+// compile_term
+push this 1
+// compile_term
+push this 2
+add
+// compile_term
+push constant 254
+lt
+not
+if-goto Square_L1_4
+// compile_statements
+// compile_do
+// compile_expression
+// compile_term
+// compile_expression_list
+// compile_expression
+// compile_term
+push constant 0
+call Screen.setColor 1
+pop temp 0
+// compile_do
+// compile_expression
+// compile_term
+// compile_expression_list
+// compile_expression
+// compile_term
+push this 0
+// compile_expression
+// compile_term
+push this 1
+// compile_expression
+// compile_term
+push this 0
+// compile_term
+push this 2
+add
+// compile_expression
+// compile_term
+push this 1
+// compile_term
+push constant 1
+add
+call Screen.drawRectangle 4
+pop temp 0
+// compile_let
+// compile_expression
+// compile_term
+push this 1
+// compile_term
+push constant 2
+add
+pop this 1
+// compile_do
+// compile_expression
+// compile_term
+// compile_expression_list
+// compile_expression
+// compile_term
+push constant 1
+neg
+call Screen.setColor 1
+pop temp 0
+// compile_do
+// compile_expression
+// compile_term
+// compile_expression_list
+// compile_expression
+// compile_term
+push this 0
+// compile_expression
+// compile_term
+// compile_expression
+// compile_term
+push this 1
+// compile_term
+push this 2
+add
+// compile_term
+push constant 1
+sub
+// compile_expression
+// compile_term
+push this 0
+// compile_term
+push this 2
+add
+// compile_expression
+// compile_term
+push this 1
+// compile_term
+push this 2
+add
+call Screen.drawRectangle 4
+pop temp 0
+goto Square_L2_4
+label Square_L1_4
+label Square_L2_4
+// compile_return
+push constant 0
+return
+// compile_subroutine_dec type method
+// compile_parameter_list
+// compile_subroutine_body
+function Square.moveLeft 0
+push argument 0
+pop pointer 0
+// compile_statements
+// compile_if
+// compile_expression
+// compile_term
+push this 0
+// compile_term
+push constant 1
+gt
+not
+if-goto Square_L1_5
+// compile_statements
+// compile_do
+// compile_expression
+// compile_term
+// compile_expression_list
+// compile_expression
+// compile_term
+push constant 0
+call Screen.setColor 1
+pop temp 0
+// compile_do
+// compile_expression
+// compile_term
+// compile_expression_list
+// compile_expression
+// compile_term
+// compile_expression
+// compile_term
+push this 0
+// compile_term
+push this 2
+add
+// compile_term
+push constant 1
+sub
+// compile_expression
+// compile_term
+push this 1
+// compile_expression
+// compile_term
+push this 0
+// compile_term
+push this 2
+add
+// compile_expression
+// compile_term
+push this 1
+// compile_term
+push this 2
+add
+call Screen.drawRectangle 4
+pop temp 0
+// compile_let
+// compile_expression
+// compile_term
+push this 0
+// compile_term
+push constant 2
+sub
+pop this 0
+// compile_do
+// compile_expression
+// compile_term
+// compile_expression_list
+// compile_expression
+// compile_term
+push constant 1
+neg
+call Screen.setColor 1
+pop temp 0
+// compile_do
+// compile_expression
+// compile_term
+// compile_expression_list
+// compile_expression
+// compile_term
+push this 0
+// compile_expression
+// compile_term
+push this 1
+// compile_expression
+// compile_term
+push this 0
+// compile_term
+push constant 1
+add
+// compile_expression
+// compile_term
+push this 1
+// compile_term
+push this 2
+add
+call Screen.drawRectangle 4
+pop temp 0
+goto Square_L2_5
+label Square_L1_5
+label Square_L2_5
+// compile_return
+push constant 0
+return
+// compile_subroutine_dec type method
+// compile_parameter_list
+// compile_subroutine_body
+function Square.moveRight 0
+push argument 0
+pop pointer 0
+// compile_statements
+// compile_if
+// compile_expression
+// compile_term
+// compile_expression
+// compile_term
+push this 0
+// compile_term
+push this 2
+add
+// compile_term
+push constant 510
+lt
+not
+if-goto Square_L1_6
+// compile_statements
+// compile_do
+// compile_expression
+// compile_term
+// compile_expression_list
+// compile_expression
+// compile_term
+push constant 0
+call Screen.setColor 1
+pop temp 0
+// compile_do
+// compile_expression
+// compile_term
+// compile_expression_list
+// compile_expression
+// compile_term
+push this 0
+// compile_expression
+// compile_term
+push this 1
+// compile_expression
+// compile_term
+push this 0
+// compile_term
+push constant 1
+add
+// compile_expression
+// compile_term
+push this 1
+// compile_term
+push this 2
+add
+call Screen.drawRectangle 4
+pop temp 0
+// compile_let
+// compile_expression
+// compile_term
+push this 0
+// compile_term
+push constant 2
+add
+pop this 0
+// compile_do
+// compile_expression
+// compile_term
+// compile_expression_list
+// compile_expression
+// compile_term
+push constant 1
+neg
+call Screen.setColor 1
+pop temp 0
+// compile_do
+// compile_expression
+// compile_term
+// compile_expression_list
+// compile_expression
+// compile_term
+// compile_expression
+// compile_term
+push this 0
+// compile_term
+push this 2
+add
+// compile_term
+push constant 1
+sub
+// compile_expression
+// compile_term
+push this 1
+// compile_expression
+// compile_term
+push this 0
+// compile_term
+push this 2
+add
+// compile_expression
+// compile_term
+push this 1
+// compile_term
+push this 2
+add
+call Screen.drawRectangle 4
+pop temp 0
+goto Square_L2_6
+label Square_L1_6
+label Square_L2_6
+// compile_return
+push constant 0
+return

@@ -1,0 +1,213 @@
+/**
+ *  A library of commonly used mathematical functions.
+ *  All functions runs in O(n), where n is the number of bits used
+ *  for representing a two's complement integer value (16 in the Hack computer). 
+ *  Note: Jack compilers implement multiplication and division
+ *  using calls to OS functions in this class.
+ */
+class Math {
+    static int n;// Number of bits used for representing a two's complement integer
+    static Array twoToThe;// Stores 2^0, 2^1, 2^2,..., 2^(n-1)
+    static int next2qy;// used for division algorithm 
+                       // to store 2qy among recursive function calls
+    
+    /** Initializes the Math library, builds data structures*/
+    function void init(){
+        let twoToThe = Array.new(16);
+        let twoToThe[0] = 1;
+        let twoToThe[1] = 2;
+        let twoToThe[2] = 4;
+        let twoToThe[3] = 8;
+        let twoToThe[4] = 16;
+        let twoToThe[5] = 32;
+        let twoToThe[6] = 64;
+        let twoToThe[7] = 128;
+        let twoToThe[8] = 256;
+        let twoToThe[9] = 512;
+        let twoToThe[10] = 1024;
+        let twoToThe[11] = 2048;
+        let twoToThe[12] = 4096;
+        let twoToThe[13] = 8192;
+        let twoToThe[14] = 16384;//0100000000000000
+        let twoToThe[15] = -32767-1;//1000000000000000
+
+        return;
+    }
+
+    /** Returns the absolute value of x. */
+    function int abs(int x){
+        if (x < 0){
+            return -x;
+        }
+        return x;
+    }
+
+     /** Returns 2^i for usage by other classes*/
+    function int powersOfTwo(int i){
+        return twoToThe[i];
+    }
+
+    /** Returns the product of x and y. 
+     *  When a Jack compiler detects the multiplication operator '*'
+     *  in an expression, it handles it by invoking this method. 
+     *  Thus, in Jack, x * y and Math.multiply(x,y) return the same value. */
+    function int multiply(int x, int y){
+        var int sum, shiftedX, i; 
+        let sum = 0;//initialize accumulator to 0
+        // variable that's going to change its value every time 
+        // we shift x to left and pad with 0's to the right
+        let shiftedX = x; 
+        let i = 0;
+        while (i < 16){
+            // if ith bit of y is 1
+            if (Math.bit(y, i)){
+                let sum  = sum + shiftedX;
+            }
+            let shiftedX = shiftedX + shiftedX;
+            let i = i + 1;
+        }
+        return sum;
+    }
+    
+    /** Returns the integer part of x / y.
+     *  When a Jack compiler detects the division operator '/'
+     *  an an expression, it handles it by invoking this method.
+     *  Thus, x/y and Math.divide(x,y) return the same value. */
+    function int divide(int x, int y){
+        var int result;
+        // division by 0 error
+        if (y = 0){
+            do Sys.error(3);
+            return 0;
+
+        }
+        
+        // Handle neg numbers: divide |x|/|y| then set result's sign
+        // use divide positive helper function
+        let result = Math.dividePos(Math.abs(x),Math.abs(y));
+
+        // set result's sign
+        // both positive or negative
+        if ((x<0) = (y<0)){
+            return result;
+        }
+        else{
+            return -result;
+        }
+    }
+    /** Returns the integer part of x/y, x >= 0, y > 0 
+    uses static variable next2qy
+    -> the value of the expression 2*q*y can be computed without
+    multiplication. Instead, it can be obtained from its value 
+    in the previous recursion level, using addition
+    */
+    function int dividePos(int x, int y){
+        var int q;
+
+        // base case
+        if ((y > x) | (y < 0))  {
+            // next2qy = 2 * return value following * half of current y
+            // = return value following * current y
+            // = 0 * current y = 0
+            let next2qy = 0;
+            return 0;
+        }
+        // recursion
+        let q = Math.dividePos(x, y+y); // divide x by double of y
+        // change comparison to replace subtraction by addition to gain efficiency
+        // from (x - next2qy) < y) to (y + next2qy) > x
+        if((y + next2qy) > x){
+            // next2qy = 2 * return value following * half of current y
+            // = 2 * 2 * current q * half of current y
+            // = 2 * current q * current y
+            // = current next2qy
+
+            // no need to update next2qy to improve efficiency
+            // let next2qy = next2qy;
+            return q + q;
+        }     
+        else{
+            // next2qy = 2 * return value following * half of current y
+            // = 2 * (2 * current q + 1) * half of current y
+            // = (2 * current q + 1) * current y
+            // = (2 * current q * current y) + current y
+            // = current next2qy + y
+            let next2qy = next2qy + y;
+            return (q + q + 1);
+        }
+    }
+    
+    /** Returns the smaller value. */
+    function int min(int x, int y){
+        if (y > x){
+            return x;
+        }
+        else{
+            return y;
+        }
+    }
+    
+    /** Returns the greater value. */
+    function int max(int x, int y){
+        if (y > x){
+            return y;
+        }
+        else{
+            return x;
+        }
+    }
+
+    /** Returns the integer part of the square root of x. */
+    function int sqrt(int x){
+        var int y, n, j, temp1, temp2, ySquared, twoYP;
+        let y = 0;
+        let ySquared = 0;// running value for y^2
+        let twoYP = 0;// running value for y * twoToThe[j+1]
+        let n = 0; // initialize n to 0
+        // find n s.t.  x <= 2^n, 2^15 overflows to -1 so check positive
+        while ((x > twoToThe[n]) & (twoToThe[n] > 0)){
+            let n = n+1;
+        }
+        // computes j = ceiling(n/2)-1
+        let j = (n-1)/2;
+        while (j > -1){
+            let temp1 = y + twoToThe[j];
+            // let temp2 = temp1 * temp1;
+            // to improve efficiency: replace multiplications with
+            // storing computations in variable ans addition
+            // use formula: (y + p)^2 = y^2 + 2*y*p + p^2
+            // let temp2 = y*y + (y * twoToThe[j+1]) + twoToThe[j+j];
+            let temp2 = ySquared + twoYP + twoToThe[j+j];
+            // to improve efficiency: to replace temp2 <= x 
+            if ((~(x < temp2)) & (temp2 > 0)){
+                // update y and other storage variables
+                // to avoid overflow we prepare next twoYP here
+                // let twoYP = twoYP + twoToThe[j+j+1];
+                let twoYP = twoYP / 2 + twoToThe[j+j];
+                let ySquared = temp2;// prepare next ySquared
+                let y = temp1;//update y
+            }
+            else{
+                //in other cases still need to halve yTimesPower because j-- 
+                let twoYP = twoYP / 2;
+            }
+            let j = j-1;
+            
+        }
+
+        return y;
+    }
+    /** returns true if the i-th bit of x is 1, 0 otherwise
+    index 0 is LSB, right-most, index 15 is MSB leftmost*/
+    function boolean bit(int x, int i){
+        // use mask:  x & twoToThe[i] cancels all the other bits
+        // so result is either twoToThe[i] if ith bit is 1 or result is 0
+        if (i = 15){
+            return x < 0;  
+        }
+        else {
+            return ((x & twoToThe[i]) = twoToThe[i]);
+        }
+        
+    }
+}

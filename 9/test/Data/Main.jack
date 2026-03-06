@@ -1,0 +1,31 @@
+/** Data type conversions */
+class Main {
+    function void main(){
+        /** Creates and manipulates the list (2,(3,(5,null)))
+        commonly referred to as (2,3,5) */
+        // char 'A' via char
+        var char c;
+        let c = 65; //'A'
+        // char 'A' via String
+        var String s;
+        let s = "A";
+        let c = s.charAt(0);// 'A'
+
+        // assign int to Array
+        var Array arr;
+        let arr = 5000;//arr  stores pointer to memory address 5000
+        let arr[100]=17;//sets memory address 5100 to 17
+
+        // convert object Fraction to Array
+        // Fraction object has 2 fields : numerator and denominator
+        // it stores reference to memry location where 2 words are stored consecutively
+        var Fraction x;
+        var Array arr;
+        let arr.new(2);//create array of length 2
+        let arr[0] = 2;
+        let arr[1] = 5;
+        let x = arr;//sets x to base address of memory block representing array [2,5]
+        do x.print()// prints "2/5"
+        return;//at this stage v points to nothing
+    }
+}

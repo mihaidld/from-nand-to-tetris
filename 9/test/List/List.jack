@@ -1,0 +1,43 @@
+/** Represents a linked list of integers:
+can be either empty list (null) or recursive (data field, List)*/
+class List {
+    field int data;
+    field List next;
+    /** Creates a list using car (atom) and cudr (tail, next = reference to new list)*/
+    constructor List new(int car, List cdr){
+        let data = car;
+        let next = cdr;
+        return this;
+    }
+
+    method int getData(){
+        return data;
+    }
+
+    method List getNext(){
+        return next;
+    }
+    /** Prints the list by sequentially traversing it 
+    when method is called the compiler passes an extra argument this, reference
+    to current object  */
+    method void print(){
+        var List current;//creates a List variable
+        let current = this;//initializes it to first item of the list
+
+        while(~(current = null)){
+            do Output.printInt(current.getData());
+            do Output.printChar(32);//prints whitespace
+            let current = current.getNext();
+        }
+        return;
+    }
+    /** Disposes this list by recursively disposing its tail */
+    method void dispose(){
+        // as long as next of current object is not null do
+        if(~(next = null)){
+            do next.dispose();
+        }
+        do Memory.deAlloc(this);
+        return;
+    }
+}

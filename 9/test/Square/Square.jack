@@ -1,0 +1,96 @@
+/** Represents a graphical square*/
+class Square{
+
+    field int x, y;//screen location of square top-left corner
+    field int size;//length of this square, in pixels
+
+    /** constructs a new square with given location  and size */
+    constructor Square new(int Ax, int Ay, int Asize){
+        let x = Ax;
+        let y = Ay;
+        let size = Asize;
+        do draw();
+        return this;
+    }
+
+    /** disposes this square */
+    method void dispose(){
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    /** Draws this square on the screen */
+    method void draw(){
+        do Screen.setColor(true);//select black
+        do Screen.drawRectangle(x, y, x + size, y + size);
+        return;
+    }
+
+    /** Erases this square from the screen 
+    Draws square again using background color*/
+    method void erase(){
+        do Screen.setColor(false);//select white
+        do Screen.drawRectangle(x, y, x + size, y + size);
+        return;
+    }
+
+    /**Increments this square's size by 2 pixels 
+    max width is 512 pixels, max height 256*/
+    method void incSize(){
+        if (((y + size) < 254) & ((x + size) < 510)){
+            do erase();
+            let size = size + 2;
+            do draw();
+        }
+        return;
+    }
+
+    /**Decrements this square's size by 2 pixels */
+    method void decSize(){
+        if (size > 2){
+            do erase();
+            let size = size - 2;
+            do draw();
+        }
+        return;
+    }
+
+    /**moves this square up by 2 pixels */
+    method void moveUp(){
+        if (y > 2){
+            do erase();
+            let y = y - 2;
+            do draw();
+        }
+        return;
+    }
+        /**moves this square down by 2 pixels */
+    method void moveDown(){
+        if ((y + size) < 255){
+            do erase();
+            let y = y + 2;
+            do draw();
+        }
+        return;
+
+    }
+        /**moves this square left by 2 pixels */
+    method void moveLeft(){
+        if (x > 2){
+            do erase();
+            let x = x - 2;
+            do draw();
+        }
+        return;
+    }
+
+    /**moves this square right by 2 pixels */
+    method void moveRight(){
+        if ((x + size) < 511){
+            do erase();
+            let x = x + 2;
+            do draw();
+        }
+        return;
+    }
+}

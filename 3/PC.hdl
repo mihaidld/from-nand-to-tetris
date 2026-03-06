@@ -1,0 +1,45 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/3/a/PC.hdl
+/**
+ * A 16-bit counter.
+ * if      reset(t): out(t+1) = 0
+ * else if load(t):  out(t+1) = in(t)
+ * else if inc(t):   out(t+1) = out(t) + 1
+ * else              out(t+1) = out(t)
+ */
+CHIP PC {
+    IN in[16], reset, load, inc;
+    OUT out[16];
+    
+    PARTS:
+    /**Get alternative inputs that could be loaded 
+    into register in 3 cases: 
+    - reset (0), 
+    - load (current in), 
+    - inc (current state incremented)*/
+    Mux16(a=state , b=false , sel=reset , out=inAfterReset );
+    Mux16(a=state , b=in , sel=load , out=inAfterLoad );
+    Inc16(in=state , out=stateInc );
+    
+    /** Get final input to load in 3 steps:
+    1. if inc is asserted select state incremented instead
+    of current state and save this intermediary input inAfterInc
+    2. if load is asserted select inAfterLoad instead
+    of previous inAfterInc and save this intermediary input inAfterIncAndLoad
+    since load bit has precedence to inc bit
+    3. if reset is asserted select inAfterReset instead
+    of previous inAfterIncAndLoad and save this final input inFinal
+    since reset bit has precedence to load and inc bits*/
+    Mux16(a=state , b=stateInc , sel=inc , out=inAfterInc );
+    Mux16(a=inAfterInc , b=inAfterLoad , sel=load , out= inAfterIncAndLoad);
+    Mux16(a= inAfterIncAndLoad, b= inAfterReset , sel=reset , out= inFinal);
+
+    /** Store new inFinal into register's state 
+    (set load to 1 since inFinal could be also state
+    if the 3 control bits are 0), 
+    output from register current state and redirect 
+    out into future state for first statements*/
+    Register(in=inFinal , load=true , out=out, out = state );
+}

@@ -1,0 +1,47 @@
+Terminal elements (atoms)
+
+Lexical elements - 5 types of terminal elements (tokens):
+keyword:"class","constructor","function","method","field","static","var","int","char","boolean","void","true","false","null","this","let","do","if","else","while","return"
+symbol: {}[]().,;+-*/&|<>=~
+integerConstant: 0...32767
+stringConstant: '"' sequence of unicode chars not including no doublequote or newline '"' 
+identifier: sequence of A-Za-z0-9_ not starting with digit
+
+Non-terminal
+
+Program structure
+class: 'class' className '{' classVarDec* subroutineDec* '}'
+classVarDec (class variable declaration): ('static'|'field') type varName (',' varName)* ';'
+type: 'int'|'char'|'boolean'| className
+subroutineDec: ('constructor'|'function'|'method') ('void'|type) subroutineName '(' parameterList ')' subroutineBody
+parameterList: (type varName) (',' (type varName)*)?
+subroutineBody: '{' varDec* statements '}'
+varDec: 'var' type varName (',' varName)* ';'
+className: identifier
+subroutineName: identifier
+varName: identifier
+
+Statements
+statements: statement* (0 or more)
+statement: ifStatement|whileStatement|letStatement|doStatement|returnStament
+letStatement: 'let' varName ('[' expression ']')? '=' expression ';'
+ifStatement: 'if' '(' expression ')' '{' statements '}' (else '{' statements '}')?
+whileStatement: 'while' '(' expression ')' '{' statements '}'
+doStatement: 'do' subroutineCall ';'
+returnStatement: 'return' expression? ';'
+
+Expressions
+expression: term (op term)? (optional pair: op term)
+term: integerConstant|stringConstant|keywordConstant|varName|varName '[' expression ']'|subroutineCall|'(' expression ')'|unaryOp term
+(to resolve which possibility we are in for a term (varName|varName '[' expression ']'|subroutineCall), the parser should look ahead:
+save the current token and advance to get the next one: 
+whitespace->varName, 
+[->varName[expression]
+(->subroutineCall
+.->className|varName
+
+subroutineCall: subroutineName '(' expressionList ')' | className|varName '.' subroutineName '(' expressionList ')'
+expressionList: (expression (',' expression)*)?
+op: '+'|'-'|'*'|'/'|'&'|'|'|'<'|'>'|'='
+unaryOp: '-'|'~'
+keywordConstant: 'true'|'false'|'null'|'this'

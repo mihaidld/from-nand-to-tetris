@@ -1,0 +1,54 @@
+/** This class provides basic program execution services.*/
+class Sys{
+
+    /**Performs all the initializations required by the OS */
+    function void init(){
+        // initialize OS
+        do Memory.init();
+        do Math.init();// Math init needs memory to be init first
+        do Output.init();
+        do Screen.init();
+        do Keyboard.init();
+
+        // start program
+        do Main.main();
+        return;
+
+    }    
+    /**  Halts the program execution
+    actually creates illusion that program is stopped, 
+    using infinite loop */
+    function void halt(){
+        var int i;
+        while (true){
+            let i = 0;
+        }
+        return;
+    }
+
+    /** Displays the error code, using the format ERR<errorCode>, and 
+    halts the program’s execution.*/
+    function void error(int errorCode){
+        do Output.printString("ERR");
+        do Output.printInt(errorCode);
+        do Sys.halt();
+        return;
+    }
+
+    /** Waits approximately duration milliseconds and returns.
+    not portable, machine-specific*/
+    function void wait(int duration){
+        var int i,j, DELAY;
+        // machine-specific delay factor
+        let i = 0;
+        let DELAY  = 350;
+        while(i < DELAY){
+            let j = 0;
+            while(j < duration){
+                let j = j+1;
+            }
+            let i  = i + 1;
+        }
+        return;
+    }
+}

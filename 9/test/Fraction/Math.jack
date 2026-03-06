@@ -1,0 +1,13 @@
+/** class that provides Math functionality (library) for other classes */
+class Math {
+        /** equivalent to static methods
+    computes greatest common divisor */
+    function int gcd(int a, int b){
+        var int r;
+        // Applies Euclid's algorithm
+        while(~(b = 0)){
+            let r = a - (b * (a / b)); // remainder of integer division a/b
+            let a = b; let b = r;}
+        return a;
+    }
+}

@@ -1,0 +1,69 @@
+/** captures user's inputs and moves square accordingly in a loop*/
+class SquareGame{
+    field Square square;//square of this game
+    field int direction;//square's current direction
+    // 0=none, 1=up, 2=down, 3=left, 4=right 
+
+    /** constructs a new square game */
+    constructor SquareGame new(){
+        let square = Square.new(0, 0, 30);
+        let direction = 0;
+        return this;
+    }
+
+    /** disposes this game */
+    method void dispose(){
+        // before we dispose our object we make sure to dispose also square created
+        do square.dispose();
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    /** move this square in current direction */
+    method void moveSquare(){
+        if (direction = 1){do square.moveUp();}
+        if (direction = 2){do square.moveDown();}
+        if (direction = 3){do square.moveLeft();}
+        if (direction = 4){do square.moveRight();}
+        do Sys.wait(5); //delays the next movement 5 milliseconds
+        return;
+    }
+
+    /** runs the game: handles user inputs via Jack OS Keyboard 
+    and moves square accordingly */
+    method void run(){
+        var char key; //key currently pressed by user
+        var boolean exit;//to decide when we want to exit game
+        let exit = false;
+
+        // Square always moving until it hits the wall
+        while(~exit){
+            // wait for a key to be pressed
+            while(key = 0){
+                // sample keyboard
+                let key = Keyboard.keyPressed();
+                //in the beginning direction 0 so not moving
+                //after direction is not 0 keeps moving in that direction until direction changes
+                // or it hits the wall
+                do moveSquare();
+
+            }
+            // once user touched keyboard to end previous loop
+            if (key = 113){let exit = true;} //q key
+            if (key = 122){do square.decSize();} //z key
+            if (key = 120){do square.incSize();} //x key
+            if (key = 131){let direction = 1;} //up arrow
+            if (key = 133){let direction = 2;} //down arrow
+            if (key = 130){let direction = 3;} //left arrow
+            if (key = 132){let direction = 4;} //down arrow
+
+            // wait for key to be released, while pressed keep moving
+            while(~(key = 0)){
+                let key = Keyboard.keyPressed();
+                do moveSquare();
+            }
+        }
+        return;
+    }
+
+}

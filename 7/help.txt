@@ -1,0 +1,160 @@
+VM -> hack assembly
+add
+sub
+neg
+eq
+gt
+lt
+and
+or
+not
+
+push segment i
+pop segment i
+
+label labelName
+goto labelName
+if-goto labelName
+
+function functionName nVars
+call functionName nVars
+return 
+
+push constant i
+@i
+D=A // D = i
+@SP
+AM=M+1 // SP++
+A=A-1 //correct previous increase (A=M)
+M=D // *SP = i
+
+// addr = segmentPointer{LCL, ARG, THIS, THAT} + i, *addr = *SP, SP--
+pop local i
+@LCL
+D=M // D = LCL
+@i
+D=D+A // D = LCL+i
+@addr or R13, R14, R15
+M=D // addr = LCL + i
+@SP
+AM=M-1 // SP--
+D=M // D == popped value from stack
+@addr or @R13
+A=M
+M=D // *addr = *SP
+
+push local i  addr = LCL + i, *SP = *addr, SP++
+@LCL
+D=M // D = LCL
+@i
+D=D+A // D = LCL+i
+@addr
+AM=D // addr = LCL + i
+D=M // D = *addr
+@SP
+AM=M+1 // SP++
+A=A-1 //correct previous increase (A=M)
+M=D // *SP = *addr
+
+(Foo.vm) static i -> Foo.i
+@SP
+AM=M-1 // SP--
+D=M // D == popped value from stack
+@Foo.i
+M=D
+
+push temp i -> RAM[5]-RAM[12]
+addr = 5 + i, *SP = *addr, SP++
+addr = 5 + i, SP--, *addr = *SP
+
+push temp 6
+@11
+D=M // D = RAM11
+@SP
+AM=M+1 // SP++
+A=A-1 //correct previous increase (A=M)
+M=D // *SP = RAM11
+
+pop temp 6
+@SP
+AM=M-1 // SP--
+D=M // D == popped value from stack
+@11
+M=D 
+
+add
+@SP
+AM=M-1 // SP-- and check (set address) towards first operand
+D=M // D=top of stack
+A=A-1 // check 2nd on stack
+M=D+M// replace 2nd with their sum
+
+sub
+@SP
+AM=M-1 // SP-- and check (set address) towards first operand
+D=M // D=top of stack
+A=A-1 // check 2nd on stack
+M=M-D// replace 2nd with difference 2nd (added before in the stack) - one on top
+
+eq
+@SP
+AM=M-1 // SP-- and check (set address) towards first operand
+D=M // D=top of stack
+A=A-1 // check 2nd on stack
+@TRUEi
+D=M-D// D = 0 if equal
+D;JEQ // jump to label TRUEi
+@SP
+A=M-1
+M=0 // 0 (False) since not equal
+@STOPi // if false jumps to label STOPi to avoid true case
+0;JMP
+(TRUEi)
+@SP
+A=M-1
+M=-1 // -1 (True all 1's) since equal
+(STOPi)
+
+
+gt
+@SP
+AM=M-1 // SP-- and check (set address) towards first operand
+D=M // D=top of stack
+A=A-1 // check 2nd on stack
+@TRUEj
+D=M-D// D > 0 if greater than
+D;JGT // jump to label TRUEj
+@SP
+A=M
+M=0 // 0 (False) since not equal
+@STOPj
+0;JMP
+(TRUEj)
+@SP
+A=M
+M=-1 // -1 (True) since equal
+(STOPj)
+
+and
+@SP
+AM=M-1 // SP-- and check (set address) towards first operand
+D=M // D=top of stack
+A=A-1 // check 2nd on stack
+M=D&M// replace 2nd with their anding
+
+not
+@SP
+A=M-1 // check (set address) towards first operand
+M=!M // negate top of stack
+
+
+pointer 0 -> THIS, pointer 1 -> THAT
+push pointer 0: *SP = THIS, SP++
+pop pointer 1: SP--, THAT = *SP
+
+pop pointer 0
+@SP
+AM=M-1 // SP--
+D=M
+@3
+M=D // RAM3=*SP

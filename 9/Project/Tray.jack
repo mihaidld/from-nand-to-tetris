@@ -1,0 +1,68 @@
+/** Represents a graphical tray*/
+class Tray{
+
+    field int x, y;//screen location of tray top-left corner
+    field int width, height;//width, height of this tray, in pixels
+    field int direction, speed;
+    /** constructs a new tray with given location  and size */
+    constructor Tray new(int Ax, int Ay, int Awidth, int Aheight){
+        let x = Ax;
+        let y = Ay;
+        let width = Awidth;
+        let height = Aheight;
+        let direction = 0;//0=still,speed=right,-speed=left
+        let speed = 5; //speed of tray
+        do draw();
+        return this;
+    }
+
+    /** accessor for x */
+    method int getX(){
+        return x;
+    }
+
+    /** accessor for y */
+    method int getY(){
+        return y;
+    }
+
+    /** disposes this tray */
+    method void dispose(){
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    /** changes direction 1 * speed for right, -1 * speed for left*/
+    method void setDirection(int Adirection){
+        let direction = Adirection * speed;
+        return;
+    }
+
+    /** Draws this tray on the screen */
+    method void draw(){
+        do Screen.setColor(true);//select black
+        do Screen.drawRectangle(x, y, x + width, y + height);
+        return;
+    }
+
+    /** Erases this tray from the screen 
+    Draws tray again using background color*/
+    method void erase(){
+        do Screen.setColor(false);//select white
+        do Screen.drawRectangle(x, y, x + width, y + height);
+        return;
+    }
+
+    /**moves this tray if direction isn't 0*/
+    method void move(){
+        if (~(direction=0)){
+            do erase();
+            let x = x + direction;
+            // correct x
+            let x = Math.max(x, 0);
+            let x = Math.min(x, 511 - width);
+            do draw();
+        }
+        return;
+    }
+}

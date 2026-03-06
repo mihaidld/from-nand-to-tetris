@@ -1,0 +1,163 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/5/CPU.hdl
+/**
+ * The Hack Central Processing unit (CPU).
+ * Parses the binary code in the instruction input and executes it according to the
+ * Hack machine language specification. In the case of a C-instruction, computes the
+ * function specified by the instruction. If the instruction specifies to read a memory
+ * value, the inM input is expected to contain this value. If the instruction specifies
+ * to write a value to the memory, sets the outM output to this value, sets the addressM
+ * output to the target address, and asserts the writeM output (when writeM = 0, any
+ * value may appear in outM).
+ * If the reset input is 0, computes the address of the next instruction and sets the
+ * pc output to that value. If the reset input is 1, sets pc to 0.
+ * Note: The outM and writeM outputs are combinational: they are affected by the
+ * instruction's execution during the current cycle. The addressM and pc outputs are
+ * clocked: although they are affected by the instruction's execution, they commit to
+ * their new values only in the next cycle.
+ */
+CHIP CPU {
+
+    IN  inM[16],         // M value input  (M = contents of RAM[A])
+        instruction[16], // Instruction for execution
+        reset;           // Signals whether to re-start the current
+                         // program (reset==1) or continue executing
+                         // the current program (reset==0).
+
+    OUT outM[16],        // M value output
+        writeM,          // Write to M? 
+        addressM[15],    // Address in data memory (of M)
+        pc[15];          // address of next instruction
+
+    PARTS:
+	// Instruction handling
+
+    // A-register
+    /** 
+    1st input into Mux A register is instruction,
+    if A-instruction instruction[0] == 0 opcode
+    2nd comes from ALU (for C-instruction) 
+    if C-instruction instruction[0] == 1 opcode, */
+    // if A-instruction 0... then we select it as input into A-register */
+    Mux16(a=instruction , b=outALU , sel=instruction[15] , out=inA );
+
+    /** Assert load for A-register 
+    if A-instruction opcode 0 (instruction[15]==0) or
+    if C-instruction opcode 1 (instruction[15]==1) and
+     destination bit for A asserted (instruction[5] == 1) */
+    And(a=instruction[15] , b=instruction[5] , out=loadAwithinCInstr );
+    Not(in=instruction[15] , out=loadAwithinAInstr );
+    Or(a=loadAwithinAInstr , b=loadAwithinCInstr , out=loadA );
+    /** A register gets input from multiplexer and
+    emits 15-bit address of M register */
+    ARegister(in=inA , load=loadA , out=outA, out[0..14]=addressM );
+
+    // ALU Operation
+    
+    /** D register has load if C-instruction opcode 1 (instruction[15]==1) and
+     destination bit for A asserted (instruction[4] == 1) */
+    And(a=instruction[15] , b=instruction[4] , out=loadD );
+    DRegister(in=outALU , load=loadD , out=outD  );
+    
+    /**   Select y input for ALU A if a control bit 
+    from instruction[12] is 0, or M if it's 1. */
+    Mux16(a=outA , b=inM , sel=instruction[12] , out=inY );
+    
+    /** ALU gets its control bits from instruction[6..11],
+    its output feeds into D-register, A-register,
+    M-register depending on destination bits 
+    e.g. ADM=result of ALU computation.
+    ALU outputs 2 control bits to specify if output 
+    is zero or negative.*/
+    ALU(x=outD , y=inY , 
+    zx=instruction[11] , nx=instruction[10] , 
+    zy=instruction[9] , ny=instruction[8] , 
+    f=instruction[7] , no=instruction[6] , 
+    out=outALU, out=outM , zr=outALUZero , ng=outALUNeg );
+    
+    /** We check also if output positive to compare later 
+    with jump bits */
+    Or(a=outALUZero , b=outALUNeg , out=outALUZeroOrNeg );
+    Not(in=outALUZeroOrNeg , out=outALUPos );
+
+    /** write into M-register if C-instruction (instruction[15] == 1), 
+    and based on destination bit for M instruction[3] */
+    And(a=instruction[15] , b=instruction[3] , out=writeM );
+
+    // Control logic
+
+    /** No jump -> increment
+    If all jump bits are 0, atLeast1jump is 0 -> no jump
+    so we increment counter*/
+    Or(a=instruction[0] , b=instruction[1] , out=jumpGorE );
+    Or(a=jumpGorE , b=instruction[2] , out=atLeast1jump );
+    Not(in=atLeast1jump , out=nojump );
+
+    /** goto case > load
+    If all 3 jump bits inside C-instruction are asserted
+    we have unconditional jump, so assert load control bit */
+    And(a=instruction[0] , b=instruction[1] , out=jumpGandE );
+    And(a=jumpGandE , b=instruction[2] , out=jumpGandEandL );
+    And(a=jumpGandEandL , b=instruction[15] , out=loadPCUncond );
+    
+    /** Conditional goto
+    Some of j bits inside C-instruction are 1
+    If condition is true PC=A (assert load bit) 
+    else PC++ (assert inc bit).
+    Check for conditional jump within C-instruction:
+    6 cases possible for conditional jump */
+    
+    // Case JGT
+    And(a=outALUPos , b= instruction[0],out=jumpP);
+    
+    // Case JEQ
+    And(a=outALUZero , b=instruction[1] , out=jumpZ );
+    
+    // Case JGE
+    And(a=instruction[0] , b=instruction[1] , out=jumpZP );
+    Or(a=outALUZero , b=outALUPos , out=outALUZeroOrPos );
+    And(a=jumpZP , b=outALUZeroOrPos , out=jumpZorPos );
+    
+    // Case JLT
+    And(a=outALUNeg , b= instruction[2],out=jumpN);
+    
+    // Case JNE
+    And(a=instruction[0] , b=instruction[2] , out=jumpNP );
+    Or(a=outALUNeg , b=outALUPos , out=outALUNegOrPos );
+    And(a=jumpNP , b=outALUNegOrPos , out=jumpNegorPos );
+    
+    // Case JLE
+    And(a=instruction[2] , b=instruction[1] , out=jumpZN );
+    And(a=jumpZN , b=outALUZeroOrNeg , out=jumpZorNeg );
+
+    Or(a=jumpP , b=jumpZ , out=jump12 );
+    Or(a=jump12 , b=jumpZorPos , out=jump123 );
+    Or(a=jump123 , b=jumpN , out=jump1234 );
+    Or(a=jump1234 , b=jumpNegorPos , out=jump12345 );
+    Or(a=jump12345 , b=jumpZorNeg , out=jump123456 );
+    And(a=jump123456 , b=instruction[15] , out=loadPCCond );
+    
+    /** if either unconditional jump or conditional jump
+    we assert load bit*/
+    Or(a=loadPCUncond , b=loadPCCond , out=loadPC );
+
+    /** if either conditional jump unmet or no jump
+    we assert inc bit*/
+    Not(in=loadPCCond , out=noLoadPCCond );
+    Or(a=nojump , b=noLoadPCCond , out=incPC );
+
+    /** Program counter takes input from A-register
+    and emits address of next instruction */
+    PC(in=outA , 
+    load=loadPC , inc=incPC , reset=reset , 
+    out[0..14]=pc );
+
+
+
+
+
+
+    
+}

@@ -1,0 +1,5 @@
+class Foo {
+    /** field variable declarations
+    static variable declarations
+    subroutine declarations: constructor, methods, functions */
+}

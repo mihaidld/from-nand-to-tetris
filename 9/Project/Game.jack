@@ -1,0 +1,154 @@
+/** captures user's inputs and moves tray accordingly in a loop*/
+class Game{
+    field Tray tray;//tray of this game
+    field Monster monster;//monster 
+    field Token token;//token 
+    field int points;//points
+    field int width, height, radius, size, speedMonster;
+
+    /** constructs a new game */
+    constructor Game new(){
+        let width = 40; // width of tray
+        let height = 5; // height of tray
+        let radius = 15; // initial radius of monster
+        let speedMonster = 3;//initial speed of monster
+        let size = 10; // side of token
+        let tray = Tray.new((512 / 2) - (width / 2), 255 - height, width, height);
+        
+        do resetMonster();
+        do resetToken();
+
+        let points = 0; // score
+        do printPoints();
+        return this;
+    }
+
+    /** disposes this game */
+    method void dispose(){
+        // before we dispose our object we make sure to dispose also sprites created
+        do tray.dispose();
+        do monster.dispose();
+        do token.dispose();
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    /** resets monster at top with new random x*/
+    method void resetMonster(){
+        var int random;
+        let random = Random.randRange(511 - (2 * radius));
+        let monster = Monster.new(radius + random, radius, radius, speedMonster);
+        return;
+    }
+
+    /** resets token at top with new random x*/
+    method void resetToken(){
+        var int random;
+        let random = Random.randRange(511 - size);
+        let token = Token.new(random, 0, size);
+        return;
+    }
+
+    /** prints score */
+    method void printPoints() {
+        /* Prints some text using the stadard library */
+        do Output.moveCursor(0,0);//move cursor to beginning
+        do Output.printString("Points: ");
+        do Output.printInt(points);
+        return;
+    }
+
+    /** check if tray hit by monster*/
+    method boolean hitMonster(){
+        // monster to the left of tray
+        if ((monster.getCenterX() + monster.getRadius()) < tray.getX()){
+            return false;
+        }
+        // tray to the left of monster
+        if ((tray.getX() + width) < (monster.getCenterX() - monster.getRadius())){
+            return false;
+        }
+        // above so check for y
+        return (tray.getY() < (monster.getCenterY() + monster.getRadius()));
+    }
+
+     /** check if tray hits token*/
+    method boolean hitToken(){
+        // token to the left of tray
+        if ((token.getX() + size) < tray.getX()){
+            return false;
+        }
+        // tray to the left of token
+        if ((tray.getX() + width) < (token.getX())){
+            return false;
+        }
+        // above so check for y
+        return (tray.getY() < (token.getY() + size));
+    }
+
+    /** check if monster reached bottom*/
+    method boolean monsterBottom(){
+        return (monster.getCenterY() = (255 - monster.getRadius())); 
+    }
+
+    /** check if token reached bottom*/
+    method boolean tokenBottom(){
+        return (token.getY() = (255 - size));
+    }
+
+    /** increase difficulty afetr each point earned*/
+    method void increaseDifficulty(){
+        let speedMonster = speedMonster + 1;//increase speed
+        let radius = radius + 1; //increase size
+        return;
+    }
+
+    /** move sprites*/
+    method void moveSprites(){
+        do tray.move();
+        do monster.move();
+        do token.move();
+        return;
+    }
+    /** runs the game: handles user inputs via Jack OS Keyboard,
+    moves sprites and checks for hits */
+    method void run(){
+        var char key; //key currently pressed by user
+        var boolean exit;//to decide when we want to exit game
+        let exit = false;
+
+        while(~exit){
+            let key = Keyboard.keyPressed();
+            if (key = 113){let exit = true;} //q key
+            if (key = 0){do tray.setDirection(0);} //no key -> no movement
+            if (key = 130){do tray.setDirection(-1);} //left arrow
+            if (key = 132){do tray.setDirection(1);} //right arrow
+            
+            do moveSprites();
+            
+            // check for hits
+            if (hitMonster()){
+                let exit = true; //game over
+            }
+            if (hitToken()){
+                let points = points + 1;
+                do printPoints();
+                do token.erase();
+                do resetToken();
+                do increaseDifficulty();
+            }
+            // check for sprites reaching bottom
+            if (monsterBottom()){
+                do monster.erase();
+                do resetMonster();
+            }
+            if (tokenBottom()){
+                do token.erase();
+                do resetToken();
+            }
+            do Sys.wait(10);
+        }
+        return;
+    }
+
+}

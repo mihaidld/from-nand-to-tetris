@@ -1,0 +1,119 @@
+function Tray.new 0
+    push constant 6
+    call Memory.alloc 1
+    pop pointer 0
+    push argument 0
+    pop this 0
+    push argument 1
+    pop this 1
+    push argument 2
+    pop this 2
+    push argument 3
+    pop this 3
+    push constant 0
+    pop this 4
+    push constant 5
+    pop this 5
+    push pointer 0
+    call Tray.draw 1
+    pop temp 0
+    push pointer 0
+    return
+function Tray.getX 0
+    push argument 0
+    pop pointer 0
+    push this 0
+    return
+function Tray.getY 0
+    push argument 0
+    pop pointer 0
+    push this 1
+    return
+function Tray.dispose 0
+    push argument 0
+    pop pointer 0
+    push pointer 0
+    call Memory.deAlloc 1
+    pop temp 0
+    push constant 0
+    return
+function Tray.setDirection 0
+    push argument 0
+    pop pointer 0
+    push argument 1
+    push this 5
+    call Math.multiply 2
+    pop this 4
+    push constant 0
+    return
+function Tray.draw 0
+    push argument 0
+    pop pointer 0
+    push constant 1
+    neg
+    call Screen.setColor 1
+    pop temp 0
+    push this 0
+    push this 1
+    push this 0
+    push this 2
+    add
+    push this 1
+    push this 3
+    add
+    call Screen.drawRectangle 4
+    pop temp 0
+    push constant 0
+    return
+function Tray.erase 0
+    push argument 0
+    pop pointer 0
+    push constant 0
+    call Screen.setColor 1
+    pop temp 0
+    push this 0
+    push this 1
+    push this 0
+    push this 2
+    add
+    push this 1
+    push this 3
+    add
+    call Screen.drawRectangle 4
+    pop temp 0
+    push constant 0
+    return
+function Tray.move 0
+    push argument 0
+    pop pointer 0
+    push this 4
+    push constant 0
+    eq
+    not
+    not
+    if-goto Tray_1
+    push pointer 0
+    call Tray.erase 1
+    pop temp 0
+    push this 0
+    push this 4
+    add
+    pop this 0
+    push this 0
+    push constant 0
+    call Math.max 2
+    pop this 0
+    push this 0
+    push constant 511
+    push this 2
+    sub
+    call Math.min 2
+    pop this 0
+    push pointer 0
+    call Tray.draw 1
+    pop temp 0
+    goto Tray_0
+label Tray_1
+label Tray_0
+    push constant 0
+    return

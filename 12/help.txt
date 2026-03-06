@@ -1,0 +1,452 @@
+Math
+
+multiply
+//Returns x*y, where x,y >= 0, O(log n)
+multiply(x,y):
+    sum = 0;//initialize accumulator to 0
+    shiftedX = x; // variable that's going to change its value every time 
+                  // we shift x to left and pad with 0's to the right
+    for i in 0...w-1 do // w is the length of a word (16 bits in Jack)
+        if ((i'th bit of y) == 1): // we start with least signigicant bit of y 
+                                   // from right to MSB left
+            sum = sum + shiftedX
+        shiftedX = shiftedX * 2 // shifts x to left // 0110 becomes 1100
+        // shift can be implemented by addition: shiftedX = shiftedX + shiftedX 
+    return sum
+
+Handle negative: 2's complement still ok
+Handle overflow: return correct result % 2^16 since we have words of 16 bits (no worry)
+Extract ith bit from 16 bit value:
+// returns true if i-th bit of x is 1, false otherwise
+function boolean bit(int x, int i) can't use bit shifting operations, 
+use static class variable array twoToThe[i] of 16 values of 2^i, i = 0,...,15
+inside Math class constructed by Math.init
+
+if i = 15: if x neg return 1, else 0
+if i = 14; if 2^14 <= x < 2^15 return 1, else 0
+if i = 13; if 2^13 < rem(x-2^14 if x >= 2^14)< 2^14 return 1, else 0
+
+Math.divide
+//Returns integer part of x/y, where x >= 0, y > 0
+naive: how many times remove y from x as long remainder >= y 
+divide(x,y):
+    div = 0;//initialize counter to 0
+    rem = x
+    while rem >= y do //
+        rem = rem - y
+        div += 1
+    return div
+
+Improved:
+keep dividing dividend by 2 times divisor, and remember 
+to multiply later result by 2 (+1 at certains steps)
+using recursion O(log n): uses only addition 
+(because subtraction and multiplication  can be implemented as an addition)
+divide(x,y):    
+    if (y>x) return 0
+    q = divide(x,2*y) // divide x by double of y
+    if((x-2*q*y) < y) // if remainder < y return result * 2 (since we used double)
+        return 2*q
+    else
+        return 2*q + 1 // else 
+
+Ex. 100 / 7 = 2 * (50/7) = 2 * (2 * (25/7)) =  2 * (2 * (2 * (...)))
+100 / 7
+iter0 100/7: q = 100/14
+iter1 100/14: q = 100/28
+iter2 100/28: q = 100/56
+iter3 100/56: q = 100/112 
+iter4 100/112: return 0
+iter3 100/56: q = 0, 100-2*0*56 = 100 not less 56, return 2*0+1= 1
+iter2 100/28: q = 1, 100-2*1*28 = 44 not less than 28, return 2*1+1 = 3
+iter1 100/14: q = 3, 100-2*3*14 = 16 not less than 14, return 2*3+1 = 7
+iter0 100/7: q = 7, 100-2*7*7 = 2 < 7, return 2*7= 14
+result: 14
+
+Handle neg numbers: divide |x|/|y| then set result's sign (4 possibilities)
+handle overflow of y: overflow can be detected when y becomes negative
+-> change base case to if (y>x) or (y<0) return 0
+
+In each iteration we have multiplications, each requiring O(n) operations
+-> compute (2*q*y) without multiplication, obtain its value from its value
+in the previous recursion level with addition
+
+divide(x, y):
+    if (y > x) {
+        next2qy = 0
+        return 0
+    }
+    q = divide(x, 2 * y)
+    if ((x - 2 * q * y) < y) {
+        next2qy = 2*(2*q)*(y/2)=current 2qy
+        return 2 * q
+    } else {
+        next2qy = 2*(2q+1)*(y/2)=(2q+1)y=current 2qy + current y
+        return 2 * q + 1
+    }
+
+
+Math.sqrt
+using binary search algorithm 
+because sqrt monotonic (grows steadly in proportion to x) and 
+its inverse x^2 easily computed as x*x
+// computes integer part of y = sqrt(x)
+// find integer y such that y^2<= x < (y+1)^2 for 0<=x<2^n
+// by performing binary search in the range 0...2^(n/2) - 1
+
+// finds n such that x <= 2^n, then computes j = ceiling(n/2)-1 and 
+// result is sum of some powers of 2: 2^j + 2^(j-1) + ... + 2^0
+// powers are skipped if sum of powers found so far (starting from largest) is above x
+sqrt(x):
+    y = 0
+    for j = ceil(n/2) - 1...0 do
+        if (y + 2^j)^2 <= x then y = y + 2^j
+    return y
+
+sqrt(1000)=31
+0<=1000<2^10 so n = 10
+y = 0
+iter0:j=10/2-1=4, (0+2^4)^2 = 16^2 <= 1000 so y = 2^4 = 16
+iter1:j=3, (16+2^3)^2 = 576 <= 1000 so y = 16+2^3 = 24
+iter2: j=2, (24+2^2)^2 = 784<= 1000 so y = 24+2^2 = 28
+iter3: j=1, (28+2^1)^2 = 900 <= 1000 so y = 30
+iter4: j=0, (30+2^0)^2 = 961 <= 1000 so y = 31
+result: 31
+
+sqrt(100)=10
+0<=100<2^7 so n = 7
+y = 0
+iter0:j=7/2-1=2.5 -> ceiling 3, (0+2^3)^2 = 64 <= 100 so y = 8
+iter1: j=2, (8+2^2)^2 = 144 not less 100 so y remains 8 (skip 2^2)
+iter2: j=1, (8+2^1)^2 = 100 <= 100 so y = 10
+iter3: j=0, (10+2^0)^2 = 121 not less 100 so y remains 10 (skip 2^0)
+result: 10
+
+Handle overflow of (y+ 2^j)^2:
+change condition from (y + 2^j)^2 <= x to (y + 2^j)^2 <= x and (y + 2^j)^2 > 0
+
+Memory
+
+RAM address
+0
+    pointers(SP, LOCAL)
+256
+    stack (variables with pointers to the heap)
+2048
+    heap
+16384
+    I/O Memory maps (Screen, Keyboard)
+24577
+    unused area
+32767
+
+Heap
+Use linked list to keep track of available free heap segments
+after de-alloc
+Every element (segment) of linked list has:
+overhead: 2 words
+- next pointer to next element
+- size of element (size data block + 2 for overhead)
+data part: RAM area available for allocation of size size
+
+During init free = entire heap is available 
+and freeList contains one long segment
+
+alloc(size): 
+traverse linked list, 
+find block of size size in one of segments
+remove it from the list and 
+give it to the client
+
+if segment.size >= size + 2 (2 for overhead), the segment is possible
+2 search algorithms
+- firstFit algo finds first possible segment 
+(even if size 2, carves segment of size 4 from found of size 20)
+- bestFit algo finds smallest possible segment 
+(not wasting available space)
+
+If no segment is found, return failure (or attempt deFrag)
+
+carve block of size size+2 from found segment:
+update free list segment with size = previous size - (size of carved block)
+
+Update segment part to account for allocation
+next points to null (0), size=size requested
+data block of size size starts with base address that will be returned
+
+return base address of block's data part to caller
+
+
+de-alloc(object): append the object block to the end of free list
+next of last current segment points to block disposed 
+(points to next of free space which is at base address of obj - 2)
+
+deFrag algo (optional) merges contiguous free spaces into 
+larger available segments for alloc
+
+freeList, alloc, dealloc, deFrag: use operations on heap array
+next = heap[addr-2]
+size = heap[addr-1]
+
+Screen
+512 wide  x 256 height pixels. 
+1 pixel = 1 bit. 
+1 word = 16 bits
+32 words/ row
+Screen memory map base address = 16384
+drawPixel:
+    address = 32*y + x/16;
+    value = Memory.peek[16384+address]; we retrieve word to manipulate
+    set (x%16)th bit of value to current color (1 or 0)
+    do Memory.poke(address, new_value)
+Need to retrieve first full word (16 bits) with peek because: 
+- we can't set bits directly, but have to manipulate words of 16 bits
+- there might be other drawings in vicinity with their bits on/off inside
+same word that we need to preserve so we change only the bit required
+Set bit using OR operation:
+to set 0th bit to 1 : or 2^0, set 2nd or 2^2 = 4
+to set 0th bit to 0 : and (not 2^0) because 2^0: 00001, not 2^0: 11110
+
+drawLine: create pixeled approximation of line that fools human brain
+implement through series of drawPixel operations
+- lines that go north-east: at each stage we decide fast to go up or right, 
+never diagonal up right since that would create impression of hole in line
+
+        xx
+      xxx  
+   xxxx 
+ xxx
+xx
+
+drawLine(x1, y1, x2, y2):
+let:
+    x = x1;
+    y = y1;
+    dx = x2-x1;
+    dy = y2-y1;
+// use counter variables to count how many pixels 
+// I went to the right (a) and how many up (b)
+a=0, b=0;
+Simplication assumption: x and y increase (dx, dy both positive)
+while (a <= dx and b <= dy) //there is more work to do
+    drawPixel(x+a, y+b)
+    // decide to go right or up
+    if going right, {a = a+1;}
+    else            {b = b+1}
+decide to go up/right based on desired angle dy/dx that we need to approch
+with b/a (what we ended up doing so far)
+if b/a > dy/dx b is too big for a -> make correction to the right and increase a
+else go up
+Division is expensive operation so
+b/a > dy/dx equiv a * dy < b * dx 
+let diff = a * dy - b * dx so condition (b/a > dy/dx) <-> (diff<0)
+diff initially is 0 (a,b=0)
+when a++, diff goes up by dy since diff from a*dy-b*dx becomes
+(a+1)*dy-b*dx = a*dy-b*dx + dy
+when b++, diff goes down by dx since diff from a*dy-b*dx becomes
+a*dy-(b+1)*dx = a*dy-b*dx - dx
+
+// decide to go right or up
+if (diff<0) {a = a+1;diff = diff + dy}
+else        {b = b+1; diff = diff - dx}
+
+drawCircle(x,y,r): x,y are coordinates of origin
+approximate circle by using 2*r horizontal rows of pixels
+draw each row with drawLine
+
+  xxxx   
+ xxxxxx
+xxxxxxxx
+ xxxxxx
+  xxxx  
+
+each row has dy from the origin: 
+so dy = -r, -r+1,...,-1,0,1, r-1, r 
+The extremities of each row of circle are points (x1, y+dy) (x2, y+dy)
+We compute x1, x2 from Pythagorean theorem within triangle 
+where hypothenuse is r, one side is dy, and 2nd side is  sqrt(r^2-dy^2)
+so x1 = x - sqrt(r^2-dy^2), x2=x+sqrt(r^2-dy^2)
+
+
+Draw filled circle: draw rows
+for each dy = -r to r:
+    drawLine(x - sqrt(r^2-dy^2), y+dy,x + sqrt(r^2-dy^2), y+dy)
+
+Draw empty circle: draw only extremities (2 points)
+for each dy = -r to r:
+    drawPixel(x - sqrt(r^2-dy^2), y+d);
+    drawPixel(x + sqrt(r^2-dy^2), y+dy);
+
+Handle overflow: r <= 181
+181^2 = 32761
+182^2 = 33124 > 2^15-1(32767)
+
+Output
+Graphical ouput -> draw pixels using Screen class 
+on 256 rows x 512 columns black&white
+
+Textual output -> write characters (pixels of images) using Output 
+on 23 rows of 64 chars b&w
+Each printable character from accepted character set 
+has a bitmap image.
+All bitmap images make a font. 
+Use 256x512 pixels grid to realize 23x64 characters grid
+Each character occupies a fixed 11-pixel high 
+(9-10 for character, 1-2 for margin below) and 
+8-pixel wide (6-7 for character, 1-2 for margin right)
+
+add 'a' into char map:
+do Output.create(ascii_code, 11 numbers)
+Each number for a row: if 0, leave empty, no draw
+1110 = 14, but inverted so 01110000 is 14 
+ 
+Cursor is a frame 11 pixels high and 8 wide that shows where 
+next character will be written:
+need to remember where the cursor is and also show it to the user
+newline: move cursor to beginning of next line
+backspace: move cursor one column left
+display a character: display char, and move cursor one column to right
+
+To display a character at location (row,col), 
+where 0<=row<=22, 0<=col<=63
+(each row of characters takes 11 rows of pixels and
+each column of characters takes 8 columns of pixels),
+we write the character’s bitmap onto the box
+of pixels ranging from 11 * row to 11 * row + 10 and 
+from 8 * col to 8 * col + 7
+
+printInt: Can be implemented by converting the integer to a string and then
+printing the string.
+
+we need to display a char (8 pixels wide as half of a word)
+drawChar (index i, row i, column j):
+    counter = 0
+    while counter < 11:
+        let address = 11 * i + j / 2;
+        // we retrieve value to manipulate
+        let value = Memory.peek[16384 + address];
+        // Math.mod(j, 2) = 0
+        if char is left part of word:
+            // to remove 1st half and keep second & 0000 0000 1111 1111
+            value = value & -256; since -256 = 1111 1111 0000 0000
+            // to replace 1st half we shift to left charMap (x 2^8)
+            // and | it to value 
+            value = value | charMap[i] 
+        else char is right part of word:
+            // to remove 2nd half and keep 1st & 1111 1111 0000 0000
+            value = value & 255 ;
+            // to replace 2nd half  0000 0000 charMap | value 
+            value = value | (charMap[i] * 256)
+
+        do Memory.poke(address, value);
+        counter++
+
+
+Keyboard input
+RAM[24576]
+
+keyPressed(): only at this time, real-time
+if a keyboard key is pressed:
+    return the key's scancode
+else:
+    return 0
+
+readChar(): has persistance
+must wait (using a loop for key to be pressed), 
+then wait again (using another loop) for the key to be released
+
+displayCursor
+// waits until key pressed, sample keyboard
+while(keyPressed()=0):
+    do nothing
+// capture key pressed
+c = code of the currently pressed key
+// waits until key released
+while(keyPressed()!=0):
+    do nothing
+// give the user some feedback
+display c at the current cursor location
+advance cursor
+return c
+
+readLine(message): 
+display the message
+we are going to build a string
+str = empty string
+repeat:
+    c = readChar()
+    if (c == newline):
+        display newline
+        return str
+    else if(c == backspace):
+            remove last char from str
+            move cursor back
+            do Output.backspace()
+        else:
+            str = str.appendChar(c)
+return str
+
+readInt: Reads characters (digits) and build the integer value
+
+String
+construction: maximum capacity
+length: actual length
+one field is the Array that holds the characters
+
+// returns String representation of non-negative int
+// starts from right to left, retrieving and chopping last digit
+int2String(val) -> str:
+    lastDigit = val % 10
+    c = char representing lastDigit
+    if (val < 10)
+        return c (as a string)
+    else 
+        // chop off last digit through integer division -> shorten value
+        // recursive call
+        return int2String(val / 10).append(c) (as a string)
+
+// returns int value of a string of digit chars
+// assuming that str[0] represents most significant digit
+// starts from left to right
+string2Int():
+    val = 0;
+    for (i = 0 ... str.length) do:
+        d = integer value of str[i]
+        val = val * 10 + d;
+    return val 
+
+Array
+Array.new = function, not constructor
+use Memory.alloc (since no one is going to call it for use)
+
+Sys
+
+Hardware contract: when computer is reset, program counter is set to 0,
+so execution starts with instruction in ROM[0]
+-> done by CPU and Program Counter hardware implementation
+
+VM contract: the following bootstrap code should be placed 
+at the top of the ROM, beginning in ROM[0] (in binary instructions):
+stack pointer = 256
+call Sys.init
+-> done by VMTranslator
+
+Jack contract: program execution starts with the function Main.main()
+so there must be a class Main with a function main inside
+-> done by every high-level Jack program
+
+OS contract: Sys.init should initialize the OS, then call Main.main()
+-> done by Sys.jack
+
+halt: 
+creates illusion that program is stopped, 
+can be implemented using infinite loop
+
+wait (miliseconds):
+can be implemented using a loop, machine specific
+with a delay factor as a constant
+play with the value to get expected result: 
+if computer is fast, value must be higher to slow it down
+if computer is slow, value can be lower to speed it up
+e.g. try to make it run for 5000 ms = 5s and compare with actual time
+

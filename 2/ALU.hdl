@@ -1,0 +1,85 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/2/ALU.hdl
+/**
+ * ALU (Arithmetic Logic Unit):
+ * Computes out = one of the following functions:
+ *                0, 1, -1,
+ *                x, y, !x, !y, -x, -y,
+ *                x + 1, y + 1, x - 1, y - 1,
+ *                x + y, x - y, y - x,
+ *                x & y, x | y
+ * on the 16-bit inputs x, y,
+ * according to the input bits zx, nx, zy, ny, f, no.
+ * In addition, computes the two output bits:
+ * if (out == 0) zr = 1, else zr = 0
+ * if (out < 0)  ng = 1, else ng = 0
+ */
+// Implementation: Manipulates the x and y inputs
+// and operates on the resulting values, as follows:
+// if (zx == 1) sets x = 0        // 16-bit constant
+// if (nx == 1) sets x = !x       // bitwise not
+// if (zy == 1) sets y = 0        // 16-bit constant
+// if (ny == 1) sets y = !y       // bitwise not
+// if (f == 1)  sets out = x + y  // integer 2's complement addition
+// if (f == 0)  sets out = x & y  // bitwise and
+// if (no == 1) sets out = !out   // bitwise not
+
+CHIP ALU {
+    IN  
+        x[16], y[16],  // 16-bit inputs        
+        zx, // zero the x input?
+        nx, // negate the x input?
+        zy, // zero the y input?
+        ny, // negate the y input?
+        f,  // compute (out = x + y) or (out = x & y)?
+        no; // negate the out output?
+    OUT 
+        out[16], // 16-bit output
+        zr,      // if (out == 0) equals 1, else 0
+        ng;      // if (out < 0)  equals 1, else 0
+
+    PARTS:
+    /** process x using control bits zx, nx
+    Use Mux16 to select between inputs x and 0 (false)
+    based on selection control bit zx and plug 
+    output into intermediary xZx (x after processing zx bit)*/
+    Mux16(a=x , b=false , sel=zx , out=xZx );
+    // compute negation of x processed by zx control
+    Not16(in=xZx , out=notxZx);
+    /** keep xZx or negate it based on nx control
+    and output x after being processed by nx control: xNx*/
+    Mux16(a=xZx , b=notxZx, sel=nx , out=xNx );
+
+    // pre-process y same way
+    Mux16(a=y , b=false , sel=zy , out=yZy );
+    Not16(in=yZy , out=notyZy);
+    Mux16(a=yZy , b=notyZy, sel=ny , out=yNy );
+
+    /** compute x+y and x^y on pre-processed x and y : 
+    xNy and yNy*/
+    Add16(a =xNx , b = yNy , out = sum );
+    And16(a= xNx, b= yNy, out= anding);
+    /*compute output after f control bit (outF)
+    by selecting between sum and anding*/
+    Mux16(a= anding, b= sum , sel= f, out=outF );
+    // compute negation of outN
+    Not16(in= outF, out=notoutF );
+    /*compute final output out after no control bit
+    by selecting between outF and its negation
+    output also intermediary pins out1 and out2 
+    (sub-buses containing 1st and 2nd half of out, 
+    and outMSB for most significant bit of out */
+    Mux16(a=outF , b=notoutF , sel=no , out=out, out[0..7]=out1, out[8..15]=out2, out[15]=outMSB  );
+    // if Orring all bits of out we get 0 then out  == 0
+    Or8Way(in=out1 , out=out8Way1st );
+    Or8Way(in=out2 , out=out8Way2nd );
+    Or(a= out8Way1st, b= out8Way1st, out= outOrred);
+    // if outOrred is 0, then out == 0 so zr set to 1
+    // if outOrred is 1, then out contains 1 bit of 1 so 
+    // out != 0 so set zr to 0
+    Not(in= outOrred, out= zr );
+    // if outMSB is 1 then out is negative 
+    And(a=outMSB , b=true , out=ng );
+}

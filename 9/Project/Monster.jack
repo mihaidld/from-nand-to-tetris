@@ -1,0 +1,91 @@
+/** Represents a graphical monster*/
+class Monster{
+
+    field int x, y;//screen location of monster's center
+    field int radius;//radius of this monster, in pixels
+    field int direction, speed;
+    /** constructs a new monster with given location and radius */
+    constructor Monster new(int Ax, int Ay, int Aradius, int Aspeed){
+        let x = Ax;
+        let y = Ay;
+        let radius = Aradius;
+        let speed = Aspeed;
+        do setDirection();//0=still,speed=right,-speed=left
+        do draw();
+        return this;
+    }
+
+    /** disposes this monster */
+    method void dispose(){
+        do Memory.deAlloc(this);
+        return;
+    }
+
+      /** set initial random direction */
+    method void setDirection(){
+        var int random;
+        let random = Random.randRange(2);//get random number between 0,1,2
+        if (random=0){
+            let direction = 0;
+        }
+        if (random=1){
+            let direction = speed;
+        }
+        if (random=2){
+            let direction = -speed;
+        }
+        return;
+    }
+    /** Draws this monster on the screen */
+    method void draw(){
+        do Screen.setColor(true);//select black
+        do Screen.drawCircle(x, y, radius);
+        return;
+    }
+
+    /** Erases this monster from the screen 
+    Draws monster again using background color*/
+    method void erase(){
+        do Screen.setColor(false);//select white
+        do Screen.drawCircle(x, y, radius);
+        return;
+    }
+
+    /** Accesor for origin x */
+    method int getCenterX(){
+        return x;
+    }
+
+    /** Accesor for origin y */
+    method int getCenterY(){
+        return y;
+    }
+
+    /** Accesor for radius */
+    method int getRadius(){
+        return radius;
+    }
+
+    /**moves this monster if direction isn't 0*/
+    method void move(){
+        do erase();
+        let y = y + speed;
+        if (~(direction=0)){
+            let x = x + direction;
+            // riccochet left wall
+            if (x < radius){
+                let x = radius;
+                let direction = speed;
+            }
+            // riccochet right wall
+            if (x > (511 - radius)){
+                let x = 511 - radius;
+                let direction = -speed;
+            }
+        }
+        // correct y for bottom
+        let y = Math.min(y, 255 - radius);
+        do draw();
+        return;
+    }
+}

@@ -1,0 +1,97 @@
+/** OS Memory operations */
+class Memory{
+
+    static Array ram;
+    static Array heap;
+    static int freeList;// linked list of available memory segments
+
+    /** Initializes the class. */
+    function void init(){
+        /* we get complete access to the entire RAM, 
+        not just an address from the heap returned by alloc
+        if we called Array.new(size) 
+        we can assign int to Array type because jack is weakly typed*/
+        let ram = 0;
+        let heap = 2048;//set heap to heapBase
+        /* free list starts at beginning of heap and contains initially
+        1 segment  of size 14334 
+        (14336 total used by heap - 2 for overhead) */
+        let freeList = 2048;
+        let heap[0] = 0;//next: points to nothing
+        let heap[1] = 14334;//length: size of initial heap
+        return;
+    }
+
+    /** Returns the value of the given RAM address*/
+    function int peek(int address){
+        return ram[address];
+    }
+
+    /** Sets the value of the given RAM address to the given value */
+    function void poke(int address, int value){
+        // set RAM[addr] = val
+        let ram[address] = value;
+        return;
+    }
+
+    /** Finds and allocates from the heap a memory block
+    of the specified size and returns reference to its base address
+    using first fit greedy algorithm
+    1. It sets current block to block to which freeList currently points.
+    2. If size current is enough it carves last segment from
+    available space and updates size of available block.
+    3. Else if not enough size:
+    4. if there is a next block it sets current to next block and 
+    goes to step 2
+    5. else retursn failure since current not enough and no next block to check
+    
+    */
+    function Array alloc(int size){
+        var Array current, block;
+        var int requiredSize;
+        //set current segment to beginning of freeList
+        let current = freeList;
+        let requiredSize = size + 2;
+        // look for possible segment while current size not enough
+        // and there is next segment in the linked list
+        while ((current[1] < requiredSize) & (current[0] > 0)){
+            // set current to value of next pointer
+            let current = heap[current - heap];
+        }
+        // finished traversing because we found segment or reached last one
+        if (current[1] > (requiredSize - 1)){
+            // found segment so carve block of size size+2 from it
+            // get beginning of segment to be placed at the end of possible segment
+            // base address + size of block - size to be used for data
+            let block = current + current[1] - size;
+            // update allocated segment
+            let block[0] = 0;//next points to null
+            let block[1] = size;// size = size requested
+
+            // update size of free segment
+            let current[1] = current[1] - requiredSize;
+
+            // offset block by 2 to account for overhead of allocated block
+            return block + 2;
+        }
+        // even last block not sufficient
+        else {
+            do Output.printString("No available free space");
+            do Output.println();
+            return 24577; //return failure (beginning of unused area)
+        }
+    }
+
+    /** De-allocates the given object and frees its space*/
+    function void deAlloc(Array object){ 
+        // set current segment to beginning of free list so 
+        // next alloc will start to search among deallocated segments so 
+        // we avoid defragmentation
+        // remember previous free list within next of block to be deallocated
+        let heap[object-heap-2] = freeList;
+        //freeList points now to beginning of segment
+        let freeList = object - 2;
+        return;
+    }
+}
+

@@ -1,0 +1,27 @@
+/** starts app, initializes the game and launches it*/
+class Main{
+
+    /** Initializes a new game and starts it*/
+    function void main(){
+        var Game game;
+        var int seed;
+        // get input from user for seed
+        let seed = Keyboard.readInt("Type a number for the seed ");
+        do Random.setSeed(seed);
+
+        /* Prints rules using the standard library*/
+        do Output.printString("Collect square tokens and avoid asteroids");
+        do Output.println();
+        do Output.printString("q to quit");
+        do Output.println();
+        do Output.printString("Good luck!");
+        do Sys.wait(4000);
+        do Screen.clearScreen();
+
+        // starts game
+        let game = Game.new();
+        do game.run();
+        do game.dispose();
+        return;
+    }
+}

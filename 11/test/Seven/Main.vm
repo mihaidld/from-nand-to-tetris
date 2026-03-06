@@ -1,0 +1,26 @@
+// compile_class
+// compile_subroutine_dec type function
+// compile_parameter_list
+// compile_subroutine_body
+function Main.main 0
+// compile_statements
+// compile_do
+// compile_expression
+// compile_term
+// compile_expression_list
+// compile_expression
+// compile_term
+push constant 1
+// compile_term
+// compile_expression
+// compile_term
+push constant 2
+// compile_term
+push constant 3
+call Math.multiply 2
+add
+call Output.printInt 1
+pop temp 0
+// compile_return
+push constant 0
+return

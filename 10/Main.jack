@@ -1,0 +1,20 @@
+/** Hello World program */
+class Main {
+    static int y, z;
+    static boolean is_gone;
+    field char a;
+
+    function void main(){
+        /* Prints some text using the stadard library*/
+        var int x;
+        do Output.printString("Hello World!");
+        do Output.println(); // New line
+        if (3 < 5){
+            let x = false;
+        }
+        else{
+            let x = 3 / 5;
+        }
+        return;
+    }
+}

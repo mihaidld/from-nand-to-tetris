@@ -1,0 +1,330 @@
+Variables:
+Create and maintain 2 symbol tables for class and subroutine 
+which reset after each compilation of class / subroutine
+varName type kind position
+Position in order in which it's declared (1st -> 0, 2nd -> 1)
+x int local 0 -> for var local variables (var int x, z;)
+y boolean argument 1 -> for arguments function f(int w, boolean y){...}
+b char this 1 -> for field class variables (field char a, b;) (previously pointer 0 has been set to this object)
+c int static 0 -> for static class variables (static int c;)
+Variable declaration doesn't generate code, just updates subroutine's symbol table
+
+Expressions
+codeWrite(exp):
+if exp is number n: 
+    output 'push n' (push constant n)
+if exp is 'variable var': 
+    output 'push var' (push local 2) from symbol table
+if exp is 'exp1 op exp2: (binary)
+    codeWrite(exp1) 
+    codeWrite(exp2) 
+    output 'op'
+if exp is 'op exp': (unary)
+    codeWrite(exp)
+    output 'op'
+if exp is f(exp1, exp2,...):(function call)
+    codeWrite(exp1)
+    codeWrite(exp2),...
+    output 'call f'
+
+Implementation of operator priority (parenthesis enforce priority)
+let x = a + b * c  -> view input as a + (b * c) (exp1 op exp2)
+push a 
+push b
+push c
+*
++
+pop x
+
+let x = a + b * c  -> view input as a + b * c
+push a
+push b
++
+push c
+*
+pop x
+
+ifStatement
+if(exp)
+    statements1
+else
+    statements2
+
+compiled (exp)
+not
+if-goto L1 # if not expression go to Label 1 where we execite statements 2
+compiled (statements1)
+goto L2
+label L1
+compiled (statements2) # present because else clause
+label L2
+
+ifStatement without else
+if(exp)
+    statements1
+
+compiled (exp)
+not
+if-goto L1
+compiled (statements1)
+goto L2
+label L1
+label L2
+
+whileStatement
+while(exp)
+    statements
+
+label L1
+compiled (exp)
+not
+if-goto L2
+compiled (statements)
+goto L1
+label L2
+
+!Labels must be running numbers, unique
+
+Objects
+set THIS using pointer 0, THAT using pointer 1 to values on the stack
+e.g. to access object data (fields) starting at RAM8000
+push 8000
+pop pointer 0 ; sets THIS to 8000 (RAM3 stores 8000)
+from now on this 0 -> RAM8000, this 2 -> RAM8002 ...
+field int x; let x = 3 -> setter for field push constant 3; pop this 0
+var int y; let y = x -> getter for field push this 0; pop local 1
+
+Set data field 0 to 17 for certain object reference 8000
+push 8000; pop pointer 0; push 17; pop this 0
+
+var Point p1; initializes p1 in the stack 
+(it stores 0, doesn't yet store base address in the heap of p1 object data)
+let p1 = Point.new(2,3); 
+sets p1 to 6012 (base address in the heap) and 
+sets RAM[6012]=2, RAM[6013]=3
+
+Calling constructor
+var Point p1, p2;
+var int d;
+-> update subroutine symbol table (no code generated for variable declaration)
+name type  kind  #
+p1   Point local 0
+p2   Point local 1
+d    int   local 2
+
+let p1 = Point.new(2,3);
+// Subroutine call
+push 2
+push 3
+call Point.new 2 // caller assumes implementation of constructor new 
+allocates memory block to store object and 
+returns its base address to caller
+pop local 0 // p1 = base address of new object
+
+Implement constructor new 
+-> gets space on RAM for new object and initializes object's state
+class Point{
+    field int x,y;
+    static int pointCount;
+    constructor Point new(int ax, int ay){
+        let x = ax;
+        let y = ay;
+        let pointCount = pointCount + 1;
+        return this;
+    }
+}
+-> creates class level symbol table
+name         type  kind  #
+x            int   field 0
+y            int   field 1
+pointCount   int   static 0
+-> creates subroutine level symbol table
+name         type   kind  #
+ax            int   argument 0
+ay            int   argument 1
+-> It consults class-level symbol table to request RAM for 2 words 
+(this object requires only 2 fields)
+push 2 > we need 2 words
+call Memory.alloc 1 -> we need 1 argument from stack 
+(it searches for free space for 2 words and returns base address)
+// let x = ax; let y = ay;
+pop pointer 0 -> anchors this at base address
+push argument 0 // search in symbol table ax : argument 0, x : this 0
+pop this 0 // let x = ax
+push argument 1
+pop this 1 // let y = ay
+// pointCount = pointCount + 1;
+push static 0
+push constant 1
+add
+pop static 0
+//return this;
+push pointer 0
+return
+
+Calling object method: the object the method is called on 
+is passed as 1st implicit argument
+let d = p1.distance(p2); -> let d = distance(p1, p2);
+Push the object and the other arguments, then call method
+push local 0;if p1 is 1st local variable
+push arg1
+call Point.distance 2 # prefix className to distinguish 
+from other distance methods in other classes
+pop d
+
+Implement object method
+class Point{
+    ...
+    method int distance(Point other){
+        var int dx, dy;
+        let dx = x - other.getx();
+        let dy = y - other.gety();
+        return Math.sqrt((dx * dx) + (dy * dy)); 
+    }
+} 
+
+//method int distance(Point other)
+//    var int dx, dy;
+-> creates subroutine level symbol table
+name         type    kind  #
+this         Point   argument 0
+other        Point   argument 1
+dx           int   local 0
+dy           int   local 1
+-> anchor this segment on the object's data, 
+then accesses ith field: push this i
+push argument 0
+pop pointer 0 // THIS = argument 0
+
+//let dx = x - other.getx();
+push this 0 // push x
+push argument 1 // push other
+call Point.getx 1 // other.getx()
+sub //x - other.getx()
+pop local 0 //dx = x - other.getx()
+...
+// return Math.sqrt((dx * dx) + (dy * dy)); 
+push local 0
+push local 0
+call Math.multiply 2
+push local 1
+push local 1
+call Math.multiply 2
+add
+call Math.sqrt 1
+return
+
+doStatement call void method
+//do p1.print()
+push p1
+call Point.print 1
+-> get rid of unnecessary value returned
+pop temp 0
+
+Implement void method
+//method void print()
+-> all methods must return a value
+... side effects
+push constant 0 // dummy value
+return
+
+Arrays
+//var Array arr; //initializes local 0 which will store arr to 0
+->generates no code, just effects symbol table
+name        type   kind  #
+arr         Array  local 0
+
+//let arr = Array.new(5);//handled like object construction
+push constant 5
+call Array.new 1
+pop local 0
+
+->Use this to represent fields values of current objects
+and that to represent values of current array
+push 8054
+pop pointer 1 //sets THAT to 8054 (RAM[4] = 8054)
+
+//arr[2]=17
+->only use that 0 for Arrays (never that 1, that 2 etc.)
+push local 0 // base address
+push 2 // offset
+add
+pop pointer 1
+push 17
+pop that 0
+
+//a[i]=b[j]
+push a
+push i
+add // stack has a+i
+push b
+push j
+add // stack has a+i, b+j
+pop pointer 1//THAT = b+j or RAM address of b[j], stack has a+i
+push that 0 //stack has a+i, b[j]
+pop temp 0//temp 0 = b[j] //stack has a+i
+pop pointer 1 //THAT = a+i or RAM address of a[i], stack empty
+push temp 0
+pop that 0 //a[i] =b[j]
+
+//arr[exp1]=exp2
+push arr
+generate code to evaluate exp1 and push value
+add // top stack = RAM address of arr[exp1]
+generate code to evaluate exp2 and push value
+pop temp 0 //top stack = RAM address of arr[exp1], temp 0 = value of exp2
+pop pointer 1
+push temp 0
+pop that 0
+
+Standard mapping Jack -> VM
+Foo.jack  -> Foo.vm
+class Foo {           
+    constructor Foo new(int x) -> function Foo.new with 1 arg
+    method void bar(int x) -> function Foo.bar with 2 args (add arg 0 this)
+    function int bax(int x) -> function Foo.baz with 1 arg
+    }
+Constants:
+    null, false -> constant 0
+    true -> constant -1 (push 1; neg) 
+* -> call Math.multiply 2
+/ -> call Math.divide 2
+
+Strings
+String constants: created using String.new(length) which returns base address of string
+String assignments: handled via series of calls to String.appendChar(c)
+//var String x; 
+//let x = "nand";
+push 4
+call String.new 1
+pop local 0 // local 0 stores base address of string length 4
+push local 0
+push int('n')
+call String.appendChar 2 // call method with arg 0 (base address of string) and arg1 (char), x="n"
+push local 0
+push int('a')
+call String.appendChar 2 // call method with arg 0 (base address of string) and arg1 (char)
+push local 0
+push int('n')
+call String.appendChar 2 // call method with arg 0 (base address of string) and arg1 (char)
+push local 0
+push int('d')
+call String.appendChar 2 // call method with arg 0 (base address of string) and arg1 (char), returns base address
+// x = "nand"
+
+Test SymbolTable with handling of identifiers
+wrap <identifier> with <category+index+context>
+category: 'local'|'arg'|'static'|'field'|'class'|'subroutine'
+index:0,1,2,...
+context:'def'|'usage'
+
+<classDef><classUsage>
+<subroutineDef><subroutineUsage>
+<static0Def><static0Usage>
+<field1Def><field0Usage>
+<arg0Def><arg0Usage>
+<local2Def><local2Usage>
+
+<classUsage><identifier>Math</identifier><classUsage>
+
+

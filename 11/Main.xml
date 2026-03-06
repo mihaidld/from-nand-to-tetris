@@ -1,0 +1,231 @@
+<class>
+    <keyword> class </keyword>
+    <classDef>
+        <identifier> Main </identifier>
+    </classDef>
+    <symbol> { </symbol>
+    <classVarDec>
+        <keyword> static </keyword>
+        <keyword> int </keyword>
+        <static0Def>
+            <identifier> y </identifier>
+        </static0Def>
+        <symbol> , </symbol>
+        <static1Def>
+            <identifier> z </identifier>
+        </static1Def>
+        <symbol> ; </symbol>
+    </classVarDec>
+    <classVarDec>
+        <keyword> static </keyword>
+        <keyword> boolean </keyword>
+        <static2Def>
+            <identifier> is_gone </identifier>
+        </static2Def>
+        <symbol> ; </symbol>
+    </classVarDec>
+    <classVarDec>
+        <keyword> field </keyword>
+        <keyword> char </keyword>
+        <field0Def>
+            <identifier> a </identifier>
+        </field0Def>
+        <symbol> ; </symbol>
+    </classVarDec>
+    <subroutineDec>
+        <keyword> function </keyword>
+        <keyword> void </keyword>
+        <subroutineDef>
+            <identifier> main </identifier>
+        </subroutineDef>
+        <symbol> ( </symbol>
+        <parameterList>
+            <keyword> char </keyword>
+            <arg0Def>
+                <identifier> d </identifier>
+            </arg0Def>
+            <symbol> , </symbol>
+            <keyword> int </keyword>
+            <arg1Def>
+                <identifier> m </identifier>
+            </arg1Def>
+        </parameterList>
+        <symbol> ) </symbol>
+        <subroutineBody>
+            <symbol> { </symbol>
+            <varDec>
+                <keyword> var </keyword>
+                <keyword> int </keyword>
+                <local0Def>
+                    <identifier> x </identifier>
+                </local0Def>
+                <symbol> , </symbol>
+                <local1Def>
+                    <identifier> w </identifier>
+                </local1Def>
+                <symbol> ; </symbol>
+            </varDec>
+            <statements>
+                <letStatement>
+                    <keyword> let </keyword>
+                    <local0Usage>
+                        <identifier> x </identifier>
+                    </local0Usage>
+                    <symbol> = </symbol>
+                    <expression>
+                        <term>
+                            <integerConstant> 4 </integerConstant>
+                        </term>
+                    </expression>
+                    <symbol> ; </symbol>
+                </letStatement>
+                <letStatement>
+                    <keyword> let </keyword>
+                    <local1Usage>
+                        <identifier> w </identifier>
+                    </local1Usage>
+                    <symbol> = </symbol>
+                    <expression>
+                        <term>
+                            <local0Usage>
+                                <identifier> x </identifier>
+                            </local0Usage>
+                        </term>
+                        <symbol> * </symbol>
+                        <term>
+                            <integerConstant> 3 </integerConstant>
+                        </term>
+                    </expression>
+                    <symbol> ; </symbol>
+                </letStatement>
+                <letStatement>
+                    <keyword> let </keyword>
+                    <static0Usage>
+                        <identifier> y </identifier>
+                    </static0Usage>
+                    <symbol> = </symbol>
+                    <expression>
+                        <term>
+                            <local1Usage>
+                                <identifier> w </identifier>
+                            </local1Usage>
+                        </term>
+                        <symbol> - </symbol>
+                        <term>
+                            <symbol> ( </symbol>
+                            <expression>
+                                <term>
+                                    <integerConstant> 2 </integerConstant>
+                                </term>
+                                <symbol> + </symbol>
+                                <term>
+                                    <arg1Usage>
+                                        <identifier> m </identifier>
+                                    </arg1Usage>
+                                </term>
+                            </expression>
+                            <symbol> ) </symbol>
+                        </term>
+                    </expression>
+                    <symbol> ; </symbol>
+                </letStatement>
+                <doStatement>
+                    <keyword> do </keyword>
+                    <identifier> Output </identifier>
+                    <classUsage>
+                        <identifier> Output </identifier>
+                    </classUsage>
+                    <symbol> . </symbol>
+                    <subroutineUsage>
+                        <identifier> printString </identifier>
+                    </subroutineUsage>
+                    <symbol> ( </symbol>
+                    <expressionList>
+                        <expression>
+                            <term>
+                                <stringConstant> Hello World! </stringConstant>
+                            </term>
+                        </expression>
+                    </expressionList>
+                    <symbol> ) </symbol>
+                    <symbol> ; </symbol>
+                </doStatement>
+                <doStatement>
+                    <keyword> do </keyword>
+                    <identifier> Output </identifier>
+                    <classUsage>
+                        <identifier> Output </identifier>
+                    </classUsage>
+                    <symbol> . </symbol>
+                    <subroutineUsage>
+                        <identifier> println </identifier>
+                    </subroutineUsage>
+                    <symbol> ( </symbol>
+                    <expressionList>
+                    </expressionList>
+                    <symbol> ) </symbol>
+                    <symbol> ; </symbol>
+                </doStatement>
+                <ifStatement>
+                    <keyword> if </keyword>
+                    <symbol> ( </symbol>
+                    <expression>
+                        <term>
+                            <integerConstant> 3 </integerConstant>
+                        </term>
+                        <symbol> &lt; </symbol>
+                        <term>
+                            <integerConstant> 5 </integerConstant>
+                        </term>
+                    </expression>
+                    <symbol> ) </symbol>
+                    <symbol> { </symbol>
+                    <statements>
+                        <letStatement>
+                            <keyword> let </keyword>
+                            <local0Usage>
+                                <identifier> x </identifier>
+                            </local0Usage>
+                            <symbol> = </symbol>
+                            <expression>
+                                <term>
+                                    <keyword> false </keyword>
+                                </term>
+                            </expression>
+                            <symbol> ; </symbol>
+                        </letStatement>
+                    </statements>
+                    <symbol> } </symbol>
+                    <keyword> else </keyword>
+                    <symbol> { </symbol>
+                    <statements>
+                        <letStatement>
+                            <keyword> let </keyword>
+                            <local0Usage>
+                                <identifier> x </identifier>
+                            </local0Usage>
+                            <symbol> = </symbol>
+                            <expression>
+                                <term>
+                                    <integerConstant> 3 </integerConstant>
+                                </term>
+                                <symbol> / </symbol>
+                                <term>
+                                    <integerConstant> 5 </integerConstant>
+                                </term>
+                            </expression>
+                            <symbol> ; </symbol>
+                        </letStatement>
+                    </statements>
+                    <symbol> } </symbol>
+                </ifStatement>
+                <returnStatement>
+                    <keyword> return </keyword>
+                    <symbol> ; </symbol>
+                </returnStatement>
+            </statements>
+            <symbol> } </symbol>
+        </subroutineBody>
+    </subroutineDec>
+    <symbol> } </symbol>
+</class>

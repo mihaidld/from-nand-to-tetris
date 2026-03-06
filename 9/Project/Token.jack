@@ -1,0 +1,56 @@
+/** Represents a graphical token*/
+class Token{
+
+    field int x, y;//screen location of token's top-left corner
+    field int size, speed;//size of this square token, in pixels and speed
+    /** constructs a new token with given location and radius */
+    constructor Token new(int Ax, int Ay, int Asize){
+        let x = Ax;
+        let y = Ay;
+        let size = Asize;
+        let speed = 1;
+        do draw();
+        return this;
+    }
+
+    /** disposes this token */
+    method void dispose(){
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    /** Accesor for x */
+    method int getX(){
+        return x;
+    }
+
+    /** Accesor for y */
+    method int getY(){
+        return y;
+    }
+
+    /** Draws this token on the screen */
+    method void draw(){
+        do Screen.setColor(true);//select black
+        do Screen.drawRectangle(x, y, x + size, y + size);
+        return;
+    }
+
+    /** Erases this token from the screen 
+    Draws token again using background color*/
+    method void erase(){
+        do Screen.setColor(false);//select white
+        do Screen.drawRectangle(x, y, x + size, y + size);
+        return;
+    }
+
+    /**moves this token if direction isn't 0*/
+    method void move(){
+        do erase();
+        let y = y + speed;
+        // correct y for bottom
+        let y = Math.min(y, 255 - size);
+        do draw();
+        return;
+    }
+}

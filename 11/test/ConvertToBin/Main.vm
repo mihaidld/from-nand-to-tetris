@@ -1,0 +1,245 @@
+// compile_class
+// compile_subroutine_dec type function
+// compile_parameter_list
+// compile_subroutine_body
+// compile_var_dec
+function Main.main 1
+// compile_statements
+// compile_do
+// compile_expression
+// compile_term
+// compile_expression_list
+// compile_expression
+// compile_term
+push constant 8001
+// compile_expression
+// compile_term
+push constant 16
+// compile_expression
+// compile_term
+// compile_term
+push constant 1
+neg
+call Main.fillMemory 3
+pop temp 0
+// compile_let
+// compile_expression
+// compile_term
+// compile_expression_list
+// compile_expression
+// compile_term
+push constant 8000
+call Memory.peek 1
+pop local 0
+// compile_do
+// compile_expression
+// compile_term
+// compile_expression_list
+// compile_expression
+// compile_term
+push local 0
+call Main.convert 1
+pop temp 0
+// compile_return
+push constant 0
+return
+// compile_subroutine_dec type function
+// compile_parameter_list
+// compile_subroutine_body
+// compile_var_dec
+// compile_var_dec
+function Main.convert 3
+// compile_statements
+// compile_let
+// compile_expression
+// compile_term
+push constant 1
+neg
+pop local 2
+// compile_while
+label Main_L1_1
+// compile_expression
+// compile_term
+push local 2
+not
+if-goto Main_L2_1
+// compile_statements
+// compile_let
+// compile_expression
+// compile_term
+push local 1
+// compile_term
+push constant 1
+add
+pop local 1
+// compile_let
+// compile_expression
+// compile_term
+// compile_expression_list
+// compile_expression
+// compile_term
+push local 0
+call Main.nextMask 1
+pop local 0
+// compile_if
+// compile_expression
+// compile_term
+// compile_term
+// compile_expression
+// compile_term
+push local 1
+// compile_term
+push constant 16
+gt
+not
+not
+if-goto Main_L1_2
+// compile_statements
+// compile_if
+// compile_expression
+// compile_term
+// compile_term
+// compile_expression
+// compile_term
+// compile_expression
+// compile_term
+push argument 0
+// compile_term
+push local 0
+and
+// compile_term
+push constant 0
+eq
+not
+not
+if-goto Main_L1_3
+// compile_statements
+// compile_do
+// compile_expression
+// compile_term
+// compile_expression_list
+// compile_expression
+// compile_term
+push constant 8000
+// compile_term
+push local 1
+add
+// compile_expression
+// compile_term
+push constant 1
+call Memory.poke 2
+pop temp 0
+goto Main_L2_3
+label Main_L1_3
+// compile_statements
+// compile_do
+// compile_expression
+// compile_term
+// compile_expression_list
+// compile_expression
+// compile_term
+push constant 8000
+// compile_term
+push local 1
+add
+// compile_expression
+// compile_term
+push constant 0
+call Memory.poke 2
+pop temp 0
+label Main_L2_3
+goto Main_L2_2
+label Main_L1_2
+// compile_statements
+// compile_let
+// compile_expression
+// compile_term
+push constant 0
+pop local 2
+label Main_L2_2
+goto Main_L1_1
+label Main_L2_1
+// compile_return
+push constant 0
+return
+// compile_subroutine_dec type function
+// compile_parameter_list
+// compile_subroutine_body
+function Main.nextMask 0
+// compile_statements
+// compile_if
+// compile_expression
+// compile_term
+push argument 0
+// compile_term
+push constant 0
+eq
+not
+if-goto Main_L1_4
+// compile_statements
+// compile_return
+// compile_expression
+// compile_term
+push constant 1
+return
+goto Main_L2_4
+label Main_L1_4
+// compile_statements
+// compile_return
+// compile_expression
+// compile_term
+push argument 0
+// compile_term
+push constant 2
+call Math.multiply 2
+return
+label Main_L2_4
+// compile_subroutine_dec type function
+// compile_parameter_list
+// compile_subroutine_body
+function Main.fillMemory 0
+// compile_statements
+// compile_while
+label Main_L1_5
+// compile_expression
+// compile_term
+push argument 1
+// compile_term
+push constant 0
+gt
+not
+if-goto Main_L2_5
+// compile_statements
+// compile_do
+// compile_expression
+// compile_term
+// compile_expression_list
+// compile_expression
+// compile_term
+push argument 0
+// compile_expression
+// compile_term
+push argument 2
+call Memory.poke 2
+pop temp 0
+// compile_let
+// compile_expression
+// compile_term
+push argument 1
+// compile_term
+push constant 1
+sub
+pop argument 1
+// compile_let
+// compile_expression
+// compile_term
+push argument 0
+// compile_term
+push constant 1
+add
+pop argument 0
+goto Main_L1_5
+label Main_L2_5
+// compile_return
+push constant 0
+return
